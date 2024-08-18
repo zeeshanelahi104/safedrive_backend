@@ -1,31 +1,50 @@
+// middleware/authMiddleware.js
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 
-const protect = async (req, res, next) => {
+// Middleware to protect routes, ensuring the user is authenticated
+exports.protect = async (req, res, next) => {
   let token;
 
-  // Check if the Authorization header contains a Bearer token
-  if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
+  // Check if the token is provided in the Authorization header
+  if (
+    req.headers.authorization &&
+    req.headers.authorization.startsWith('Bearer')
+  ) {
     try {
-      // Get the token from the Authorization header
+      // Get token from the Authorization header
       token = req.headers.authorization.split(' ')[1];
 
-      // Verify the token using the JWT secret
+      // Verify the token
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-      // Attach the user object to the request object
-      req.user = await User.findById(decoded.id).select('-password'); // Select everything except the password
+      // Find the user associated with the token
+      req.user = await User.findById(decoded.id).select('-password');
 
-      next(); // Call the next middleware or route handler
+      if (!req.user) {
+        return res.status(401).json({ message: 'Not authorized, user not found' });
+      }
+
+      // Proceed to the next middleware or route handler
+      next();
     } catch (error) {
       console.error(error);
       res.status(401).json({ message: 'Not authorized, token failed' });
     }
   }
 
+  // If no token is found, return an error
   if (!token) {
-    res.status(401).json({ message: 'Not authorized, no token' });
+    return res.status(401).json({ message: 'Not authorized, no token' });
   }
 };
 
-module.exports = protect;
+// Middleware to check if the authenticated user is an admin
+exports.admin = (req, res, next) => {
+  if (req.user && req.user.isAdmin) {
+    // Proceed to the next middleware or route handler
+    next();
+  } else {
+    res.status(403).json({ message: 'Not authorized as an admin' });
+  }
+};
