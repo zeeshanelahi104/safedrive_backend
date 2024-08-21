@@ -15,7 +15,7 @@ const generateToken = (id) => {
 // @desc    Register a new user
 // @route   POST /api/users/register
 // @access  Public
-exports.registerUser = async (req, res) => {
+registerUser = async (req, res) => {
     const { firstName, lastName, email, password } = req.body;
   
     if (!firstName || !lastName || !email || !password) {
@@ -54,7 +54,7 @@ exports.registerUser = async (req, res) => {
 // @desc    Authenticate user & get token
 // @route   POST /api/users/login
 // @access  Public
-exports.authUser = async (req, res) => {
+authUser = async (req, res) => {
     const { email, password } = req.body;
   
     if (!email || !password) {
@@ -84,7 +84,7 @@ exports.authUser = async (req, res) => {
 // @desc    Get user profile
 // @route   GET /api/users/profile
 // @access  Private
-exports.getUserProfile = async (req, res) => {
+getUserProfile = async (req, res) => {
     try {
       const user = await User.findById(req.user.id);
   
@@ -107,7 +107,7 @@ exports.getUserProfile = async (req, res) => {
 // @desc    Update user profile
 // @route   PUT /api/users/profile
 // @access  Private
-exports.updateUserProfile = async (req, res) => {
+updateUserProfile = async (req, res) => {
     try {
       const user = await User.findById(req.user.id);
   
@@ -141,7 +141,7 @@ exports.updateUserProfile = async (req, res) => {
 // @desc    Get all users
 // @route   GET /api/users
 // @access  Private/Admin
-exports.getAllUsers = async (req, res) => {
+getAllUsers = async (req, res) => {
     try {
       const users = await User.find({});
       res.json(users);
@@ -152,7 +152,7 @@ exports.getAllUsers = async (req, res) => {
   
 
 
-  exports.changePassword = async (req, res) => {
+changePassword = async (req, res) => {
     const { firstName, lastName, email, currentPassword, newPassword } = req.body;
   
     if (!firstName || !lastName || !email || !currentPassword || !newPassword) {
@@ -182,7 +182,7 @@ exports.getAllUsers = async (req, res) => {
   };
   
 
-  exports.createCheckoutSession = async (req, res) => {
+createCheckoutSession = async (req, res) => {
     const { customerId } = req.body;
   
     if (!customerId) {
@@ -207,7 +207,7 @@ exports.getAllUsers = async (req, res) => {
 
   
 
-  exports.createCustomer = async (req, res) => {
+createCustomer = async (req, res) => {
     const { email, name } = req.body;
   
     if (!email) {
@@ -228,7 +228,7 @@ exports.getAllUsers = async (req, res) => {
   };
 
   
-  exports.createPaymentIntent = async (req, res) => {
+  createPaymentIntent = async (req, res) => {
     const { amount, stripeCustomerId, paymentMethodId, customerName, customerAddress } = req.body;
   
     if (!amount || !stripeCustomerId || !paymentMethodId || !customerName || !customerAddress) {
@@ -263,7 +263,7 @@ exports.getAllUsers = async (req, res) => {
   };
   
 
-  exports.createSetupIntent = async (req, res) => {
+  createSetupIntent = async (req, res) => {
     const { stripeCustomerId } = req.body;
   
     if (!stripeCustomerId) {
@@ -284,7 +284,7 @@ exports.getAllUsers = async (req, res) => {
   };
 
   
-  exports.findAccount = async (req, res) => {
+findAccount = async (req, res) => {
     const { email, firstName, lastName } = req.body;
   
     if (!email || !firstName || !lastName) {
@@ -305,7 +305,7 @@ exports.getAllUsers = async (req, res) => {
   };
 
   
-  exports.forgotPassword = async (req, res) => {
+  forgotPassword = async (req, res) => {
     const { email } = req.body;
   
     if (!email) {
@@ -346,7 +346,7 @@ exports.getAllUsers = async (req, res) => {
   };
 
   
-  exports.resetPassword = async (req, res) => {
+  resetPassword = async (req, res) => {
     const { token, password } = req.body;
   
     if (!token || !password) {
@@ -371,3 +371,19 @@ exports.getAllUsers = async (req, res) => {
     }
   };
   
+
+  module.exports = {
+    registerUser,
+    authUser,
+    getUserProfile,
+    updateUserProfile,
+    getAllUsers,
+    changePassword,
+    createCheckoutSession,
+    createCustomer,
+    createPaymentIntent,
+    createSetupIntent,
+    findAccount,
+    forgotPassword,
+    resetPassword,
+  };
