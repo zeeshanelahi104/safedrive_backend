@@ -31,7 +31,7 @@ router.post('/create-checkout-session', protect, createCheckoutSession);
 router.post('/create-customer', protect, createCustomer);
 router.post('/create-payment-intent', protect, createPaymentIntent);
 router.post('/create-setup-intent', protect, createSetupIntent);
-router.get('/users', protect, admin, getAllUsers); // Admin route
+router.get('/users',  getAllUsers); // Admin route
 
 // User profile routes
 router.route('/profile')
