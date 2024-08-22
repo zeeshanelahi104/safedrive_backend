@@ -1,8 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const morgan = require('morgan');
-// const firstEntityRoutes = require('./routes/firstEntityRoutes');
-const userRoutes = require('./routes/userRoutes');
+const userRoutes = require('./routes/userRoutes'); // Make sure this path is correct
 
 const app = express();
 
@@ -16,7 +15,7 @@ app.get('/', (req, res) => {
   res.send('API is running...');
 });
 
-// Routes for entities
+// Routes for user-related endpoints
 app.use('/api/user', userRoutes);
 
 // Error handling middleware
@@ -25,5 +24,4 @@ app.use((err, req, res, next) => {
   res.status(500).send({ message: 'An error occurred', error: err.message });
 });
 
-// Export the app for use in server.js
 module.exports = app;

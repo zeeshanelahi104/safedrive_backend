@@ -16,9 +16,9 @@ const generateToken = (id) => {
 // @route   POST /api/users/register
 // @access  Public
 registerUser = async (req, res) => {
-    const { firstName, lastName, email, password } = req.body;
-  
-    if (!firstName || !lastName || !email || !password) {
+    const { firstName, lastName, email, password, phone, role } = req.body;
+  console.log("Request", req)
+    if (!firstName || !lastName || !email || !password || !phone || !role) {
       return res.status(400).json({ message: 'All fields are required' });
     }
   
@@ -35,14 +35,18 @@ registerUser = async (req, res) => {
         firstName,
         lastName,
         email,
+        phone,
+        role,
         password: hashedPassword,
       });
-  
+  console.log("User", user)
       res.status(201).json({
         _id: user._id,
         firstName: user.firstName,
         lastName: user.lastName,
         email: user.email,
+        phone: user.phone,
+        role: user.role,
         token: generateToken(user._id),
       });
     } catch (error) {
@@ -84,60 +88,95 @@ authUser = async (req, res) => {
 // @desc    Get user profile
 // @route   GET /api/users/profile
 // @access  Private
-getUserProfile = async (req, res) => {
-    try {
-      const user = await User.findById(req.user.id);
-  
-      if (user) {
-        res.json({
-          _id: user._id,
-          firstName: user.firstName,
-          lastName: user.lastName,
-          email: user.email,
-        });
-      } else {
-        res.status(404).json({ message: 'User not found' });
-      }
-    } catch (error) {
-      res.status(500).json({ message: 'Error fetching user profile', error });
+const getUserProfile = async (req, res) => {
+  try {
+    // Extract userId from request parameters
+    const { id } = req.params;
+
+    // Find the user by ID
+    const user = await User.findById(id);
+
+    if (user) {
+      res.json({
+        _id: user._id,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
+      });
+    } else {
+      res.status(404).json({ message: 'User not found' });
     }
-  };
-  
+  } catch (error) {
+    res.status(500).json({ message: 'Error fetching user profile', error });
+  }
+};
 
 // @desc    Update user profile
 // @route   PUT /api/users/profile
 // @access  Private
-updateUserProfile = async (req, res) => {
-    try {
-      const user = await User.findById(req.user.id);
-  
-      if (user) {
-        user.firstName = req.body.firstName || user.firstName;
-        user.lastName = req.body.lastName || user.lastName;
-        user.email = req.body.email || user.email;
-  
-        if (req.body.password) {
-          user.password = encrypt(req.body.password);
-        }
-  
-        const updatedUser = await user.save();
-  
-        res.json({
-          _id: updatedUser._id,
-          firstName: updatedUser.firstName,
-          lastName: updatedUser.lastName,
-          email: updatedUser.email,
-          token: generateToken(updatedUser._id),
-        });
-      } else {
-        res.status(404).json({ message: 'User not found' });
-      }
-    } catch (error) {
-      res.status(500).json({ message: 'Error updating user profile', error });
-    }
-  };
-  
+const updateUserProfile = async (req, res) => {
+  try {
+    // Extract userId from request parameters
+    const { id } = req.params;
+    const { password, newPassword, firstName, lastName, email } = req.body;
 
+    // Find the user by ID
+    const user = await User.findById(id);
+
+    if (user) {
+      // Verify current password
+      const decryptedPassword = decrypt(user.password);
+      if (password && decryptedPassword !== password) {
+        return res.status(400).json({ valid: false, message: "Current password is incorrect" });
+      }
+
+      // Update user details
+      user.firstName = firstName || user.firstName;
+      user.lastName = lastName || user.lastName;
+      user.email = email || user.email;
+
+      // Update password if new password is provided
+      if (newPassword) {
+        user.password = encrypt(newPassword);
+      }
+
+      const updatedUser = await user.save();
+
+      res.json({
+        _id: updatedUser._id,
+        firstName: updatedUser.firstName,
+        lastName: updatedUser.lastName,
+        email: updatedUser.email,
+        token: generateToken(updatedUser._id),
+      });
+    } else {
+      res.status(404).json({ message: 'User not found' });
+    }
+  } catch (error) {
+    res.status(500).json({ message: 'Error updating user profile', error });
+  }
+};
+
+
+  
+const verifypassword = async (req, res) => {
+  const { userId, password } = req.body;
+  try {
+    const user = await User.findById(userId);
+    if (user) {
+      const decryptedPassword = decrypt(user.password);
+      if (password === decryptedPassword) {
+        res.status(200).json({ valid: true });
+      } else {
+        res.status(400).json({ valid: false, message: "Current password is incorrect" });
+      }
+    } else {
+      res.status(404).json({ message: 'User not found' });
+    }
+  } catch (error) {
+    res.status(500).json({ message: 'Error verifying password', error });
+  }
+};
 // @desc    Get all users
 // @route   GET /api/users
 // @access  Private/Admin
@@ -153,9 +192,9 @@ getAllUsers = async (req, res) => {
 
 
 changePassword = async (req, res) => {
-    const { firstName, lastName, email, currentPassword, newPassword } = req.body;
+    const { firstName, lastName, email, password, newPassword } = req.body;
   
-    if (!firstName || !lastName || !email || !currentPassword || !newPassword) {
+    if (!firstName || !lastName || !email || !password || !newPassword) {
       return res.status(400).json({ message: 'All fields are required' });
     }
   
@@ -168,7 +207,7 @@ changePassword = async (req, res) => {
   
       const decryptedPassword = decrypt(user.password);
   
-      if (currentPassword !== decryptedPassword) {
+      if (password !== decryptedPassword) {
         return res.status(400).json({ message: 'Current password is incorrect' });
       }
   
@@ -377,6 +416,7 @@ findAccount = async (req, res) => {
     authUser,
     getUserProfile,
     updateUserProfile,
+    verifypassword,
     getAllUsers,
     changePassword,
     createCheckoutSession,

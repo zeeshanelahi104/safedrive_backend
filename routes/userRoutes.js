@@ -31,11 +31,10 @@ router.post('/create-checkout-session', protect, createCheckoutSession);
 router.post('/create-customer', protect, createCustomer);
 router.post('/create-payment-intent', protect, createPaymentIntent);
 router.post('/create-setup-intent', protect, createSetupIntent);
-router.get('/users',  getAllUsers); // Admin route
-
+router.get('/users', protect, admin, getAllUsers); // Admin route
+router.route('/profile/:id').get(getUserProfile);
+// router.route('/verify-password').post(verifyCurrentPassword);
 // User profile routes
-router.route('/profile')
-  .get(protect, getUserProfile)
-  .put(protect, updateUserProfile);
+router.route('/profile/:id').put( updateUserProfile);
 
 module.exports = router;

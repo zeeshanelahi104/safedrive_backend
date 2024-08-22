@@ -1,7 +1,6 @@
-// utils/encryption.js
 const crypto = require('crypto');
 
-const ENCRYPTION_KEY = process.env.ENCRYPTION_KEY || '0123456789abcdef0123456789abcdef'; // 32 bytes key for AES-256
+const ENCRYPTION_KEY = process.env.ENCRYPTION_KEY || '0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef'; // 32 bytes key for AES-256
 const IV_LENGTH = 16; // AES block size
 
 // Function to encrypt text
@@ -16,7 +15,7 @@ function encrypt(text) {
 // Function to decrypt text
 function decrypt(text) {
   const textParts = text.split(':');
-  const iv = Buffer.from(textParts.shift(), 'hex');
+  const iv = Buffer.from(textParts.shift(), 'hex'); // No non-null assertion needed
   const encryptedText = Buffer.from(textParts.join(':'), 'hex');
   const decipher = crypto.createDecipheriv('aes-256-cbc', Buffer.from(ENCRYPTION_KEY, 'hex'), iv);
   let decrypted = decipher.update(encryptedText);
