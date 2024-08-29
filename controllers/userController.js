@@ -360,7 +360,6 @@ findAccount = async (req, res) => {
   
       const resetToken = generateToken(user._id);
       const resetUrl = `${process.env.NEXT_PUBLIC_SITE_URL}/reset-password?token=${resetToken}`;
-      // const resetUrl = `https://saferides.vercel.app/reset-password?token=${token}`;
       const transporter = nodemailer.createTransport({
         service: 'Gmail',
         auth: {
