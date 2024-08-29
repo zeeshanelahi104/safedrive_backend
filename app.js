@@ -7,11 +7,16 @@ const app = express();
 
 // Middleware
 app.use(express.json()); // For parsing JSON request bodies
-app.use(cors({
-  origin: process.env.NEXT_PUBLIC_SITE_URL, // Allow your frontend's origin
+const corsOptions = {
+  origin: process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000', // Allow your frontend's origin
   methods: 'GET,POST,PUT,DELETE', // Allow specific HTTP methods
   credentials: true, // Allow cookies and other credentials
-}));
+  optionsSuccessStatus: 200, // For legacy browsers support
+};
+
+app.use(cors(corsOptions));
+app.options('*', cors(corsOptions)); // Handle preflight requests
+
 app.use(morgan('dev')); // HTTP request logger
 
 // Root route (API status)
