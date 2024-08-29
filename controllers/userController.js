@@ -385,7 +385,7 @@ findAccount = async (req, res) => {
   };
 
   
-  resetPassword = async (req, res) => {
+  const resetPassword = async (req, res) => {
     const { token, password } = req.body;
   
     if (!token || !password) {
@@ -393,20 +393,32 @@ findAccount = async (req, res) => {
     }
   
     try {
+      await dbConnect();
+  
+      // Verify the token
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
   
+      // Find the user by the ID from the decoded token
       const user = await User.findById(decoded.id);
   
       if (!user) {
         return res.status(400).json({ message: 'Invalid token' });
       }
   
-      user.password = encrypt(password);
+      // Encrypt the new password
+      const encryptedPassword = encrypt(password);
+  
+      // Update the user's password and clear any reset token fields
+      user.password = encryptedPassword;
+      user.resetPasswordToken = undefined;
+      user.resetPasswordExpires = undefined;
+  
       await user.save();
   
-      res.json({ message: 'Password reset successful' });
+      return res.json({ message: 'Password reset successful' });
     } catch (error) {
-      res.status(500).json({ message: 'Error resetting password', error });
+      console.error('Error resetting password:', error);
+      return res.status(500).json({ message: 'Internal Server Error' });
     }
   };
   
