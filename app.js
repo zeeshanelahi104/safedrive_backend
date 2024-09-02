@@ -1,7 +1,8 @@
 const express = require('express');
 const cors = require('cors');
 const morgan = require('morgan');
-const userRoutes = require('./routes/userRoutes'); // Ensure this path is correct
+const userRoutes = require('./routes/userRoutes');
+const customerRoutes = require('./routes/customerRoutes');
 
 const app = express();
 
@@ -28,7 +29,7 @@ app.get('/', (req, res) => {
 
 // Routes for user-related endpoints
 app.use('/api/user', userRoutes);
-app.use('/customers', customerRoutes);
+app.use('/api/customers', customerRoutes);
 // Error handling middleware
 app.use((err, req, res, next) => {
   console.error(err.stack);

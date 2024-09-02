@@ -13,6 +13,7 @@ const {
   findAccount,
   forgotPassword,
   resetPassword,
+  searchReservation,
 } = require('../controllers/userController');
 const { protect, admin } = require('../middlewares/authMiddleware');
 
