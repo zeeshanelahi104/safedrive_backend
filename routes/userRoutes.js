@@ -33,6 +33,8 @@ router.post('/create-payment-intent', protect, createPaymentIntent);
 router.post('/create-setup-intent', protect, createSetupIntent);
 router.get('/users', protect, admin, getAllUsers); // Admin route
 router.route('/profile/:id').get(getUserProfile);
+// Reservation search route
+router.get('/searchReservation', searchReservation);
 // router.route('/verify-password').post(verifyCurrentPassword);
 // User profile routes
 router.route('/profile/:id').put( updateUserProfile);

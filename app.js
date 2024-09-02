@@ -28,7 +28,7 @@ app.get('/', (req, res) => {
 
 // Routes for user-related endpoints
 app.use('/api/user', userRoutes);
-
+app.use('/customers', customerRoutes);
 // Error handling middleware
 app.use((err, req, res, next) => {
   console.error(err.stack);

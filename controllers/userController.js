@@ -435,7 +435,33 @@ const resetPassword = async (req, res) => {
     return res.status(500).json({ message: "Internal Server Error" });
   }
 };
+// Search Reservation Function
+const searchReservation = async (req, res) => {
+  if (req.method === 'GET') {
+    const { lastName, email, phone } = req.query;
 
+    try {
+      const reservations = await RideQuote.find({
+        $or: [
+          { 'selectedRide.customer.lastName': lastName },
+          { 'selectedRide.customer.email': email },
+          { 'selectedRide.customer.phone': phone },
+        ],
+      });
+
+      if (reservations.length > 0) {
+        return res.status(200).json({ reservations });
+      } else {
+        return res.status(404).json({ message: 'Reservation Not Found!' });
+      }
+    } catch (error) {
+      console.error('Error searching reservations:', error);
+      return res.status(500).json({ message: 'Error Searching Reservation.' });
+    }
+  } else {
+    return res.status(405).json({ message: 'Method Not Allowed' });
+  }
+};
 module.exports = {
   registerUser,
   authUser,
@@ -451,4 +477,5 @@ module.exports = {
   findAccount,
   forgotPassword,
   resetPassword,
+  searchReservation
 };
