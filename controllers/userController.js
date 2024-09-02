@@ -441,7 +441,7 @@ const searchReservation = async (req, res) => {
     const { lastName, email, phone } = req.query;
 
     try {
-      const reservations = await RideQuote.find({
+      const reservations = await User.find({
         $or: [
           { 'selectedRide.customer.lastName': lastName },
           { 'selectedRide.customer.email': email },
