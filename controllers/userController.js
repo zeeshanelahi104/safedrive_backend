@@ -443,9 +443,9 @@ const searchReservation = async (req, res) => {
     try {
       const reservations = await User.find({
         $or: [
-          { 'selectedRide.customer.lastName': lastName },
-          { 'selectedRide.customer.email': email },
-          { 'selectedRide.customer.phone': phone },
+          { 'lastName': lastName },
+          { 'email': email },
+          { 'phone': phone },
         ],
       });
 
