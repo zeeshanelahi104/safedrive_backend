@@ -14,6 +14,7 @@ const {
   forgotPassword,
   resetPassword,
   searchReservation,
+  getUserById,
 } = require('../controllers/userController');
 const { protect, admin } = require('../middlewares/authMiddleware');
 
@@ -33,6 +34,8 @@ router.post('/create-customer', protect, createCustomer);
 router.post('/create-payment-intent', protect, createPaymentIntent);
 router.post('/create-setup-intent', protect, createSetupIntent);
 router.get('/users', protect, admin, getAllUsers); // Admin route
+// GET user by ID
+router.get('/:id',protect, admin, getUserById);
 router.route('/profile/:id').get(getUserProfile);
 // Reservation search route
 router.get('/searchReservation', searchReservation);

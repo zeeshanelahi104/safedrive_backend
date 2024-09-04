@@ -462,6 +462,43 @@ const searchReservation = async (req, res) => {
     return res.status(405).json({ message: 'Method Not Allowed' });
   }
 };
+// @desc    Get user by ID
+// @route   GET /api/users/:id
+// @access  Private/Admin
+const getUserById = async (req, res) => {
+  try {
+    // Extract userId from request parameters
+    const { id } = req.params;
+
+    // Find the user by ID
+    const user = await User.findById(id);
+
+    if (user) {
+      res.json({
+        _id: user._id,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
+        phone: user.phone,
+        role: user.role,
+        address: user.address, // Include address details
+        billingDetails: user.billingDetails, // Include billing details
+        stripeCustomerId: user.stripeCustomerId,
+        paymentMethodId: user.paymentMethodId,
+        selectedReservations: user.selectedReservations, // Include reservations
+        createdAt: user.createdAt,
+        updatedAt: user.updatedAt,
+      });
+    } else {
+      res.status(404).json({ message: "User not found" });
+    }
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching user details", error });
+  }
+};
+
+module.exports = { getUserById };
+
 module.exports = {
   registerUser,
   authUser,
@@ -477,5 +514,6 @@ module.exports = {
   findAccount,
   forgotPassword,
   resetPassword,
-  searchReservation
+  searchReservation,
+  getUserById
 };
