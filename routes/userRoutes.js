@@ -35,7 +35,7 @@ router.post('/create-payment-intent', protect, createPaymentIntent);
 router.post('/create-setup-intent', protect, createSetupIntent);
 router.get('/users', protect, admin, getAllUsers); // Admin route
 // GET user by ID
-router.get('/:id',protect, admin, getUserById);
+router.get('/:id', getUserById);
 router.route('/profile/:id').get(getUserProfile);
 // Reservation search route
 router.get('/searchReservation', searchReservation);
