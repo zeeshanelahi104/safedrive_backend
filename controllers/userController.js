@@ -437,33 +437,80 @@ const resetPassword = async (req, res) => {
 };
 // Search Reservation Function
 const searchReservation = async (req, res) => {
-  if (req.method === 'GET') {
-    const { lastName, email, phone } = req.query;
+  if (req.method === 'POST') {
+    const { lastName, email, phone } = req.body;
+    console.log('Received Request Body:', { lastName, email, phone });
 
     try {
-      const reservations = await User.find({
-        $or: [
-          { 'lastName': lastName },
-          { 'email': email },
-          { 'phone': phone },
-        ],
+      const user = await User.findOne({
+        lastName: new RegExp(`^${lastName}$`, 'i'),
+        email: new RegExp(`^${email}$`, 'i'),
+        phone: new RegExp(`^${phone}$`, 'i'),
       });
+      
+      console.log('Users found:', user);
 
-      if (reservations.length > 0) {
-        return res.status(200).json({ reservations });
-      } else {
-        return res.status(404).json({ message: 'Reservation Not Found!' });
+      if (user.length === 0) {
+        console.log('No user found');
+        return res.status(404).json({ message: 'User not found' });
       }
+
+      return res.status(200).json({ user: user });
     } catch (error) {
-      console.error('Error searching reservations:', error);
-      return res.status(500).json({ message: 'Error Searching Reservation.' });
+      console.error('Error fetching user details:', error);
+      return res.status(500).json({ message: 'Error fetching user details', error: error.message || 'Unknown Error' });
     }
   } else {
     return res.status(405).json({ message: 'Method Not Allowed' });
   }
 };
+// Search Reservation Function
+const searchByPhone = async (req, res) => {
+  if (req.method === 'POST') {
+    const { phone } = req.body;
+    console.log('Received Request Body:', { phone });
+
+    try {
+      const user = await User.findOne({
+        phone: new RegExp(`^${phone}$`, 'i'),
+      });
+      
+      console.log('Users found:', user);
+
+      if (user.length === 0) {
+        console.log('No user found');
+        return res.status(404).json({ message: 'User not found' });
+      }
+
+      return res.status(200).json({ user: user });
+    } catch (error) {
+      console.error('Error fetching user details:', error);
+      return res.status(500).json({ message: 'Error fetching user details', error: error.message || 'Unknown Error' });
+    }
+  } else {
+    return res.status(405).json({ message: 'Method Not Allowed' });
+  }
+};
+
+
+
+
+const getAllReservations = async (req, res) => {
+  if (req.method === 'GET') {
+    try {
+      const reservations = await User.find({}); // Fetch all reservations
+      return res.status(200).json({ reservations });
+    } catch (error) {
+      console.error('Error fetching all reservations:', error);
+      return res.status(500).json({ message: 'Error fetching all reservations.' });
+    }
+  } else {
+    return res.status(405).json({ message: 'Method Not Allowed' });
+  }
+};
+
 // @desc    Get user by ID
-// @route   GET /api/users/:id
+// @route   GET /api/user/:id
 // @access  Private/Admin
 const getUserById = async (req, res) => {
   try {
@@ -515,5 +562,7 @@ module.exports = {
   forgotPassword,
   resetPassword,
   searchReservation,
-  getUserById
+  getUserById,
+  getAllReservations,
+  searchByPhone
 };

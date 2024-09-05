@@ -15,6 +15,7 @@ const {
   resetPassword,
   searchReservation,
   getUserById,
+  searchByPhone,
 } = require('../controllers/userController');
 const { protect, admin } = require('../middlewares/authMiddleware');
 
@@ -38,7 +39,8 @@ router.get('/users', protect, admin, getAllUsers); // Admin route
 router.get('/:id', getUserById);
 router.route('/profile/:id').get(getUserProfile);
 // Reservation search route
-router.get('/searchReservation', searchReservation);
+router.post('/searchReservation', searchReservation);
+router.post('/searchByPhone', searchByPhone);
 // router.route('/verify-password').post(verifyCurrentPassword);
 // User profile routes
 router.route('/profile/:id').put( updateUserProfile);
