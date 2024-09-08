@@ -94,6 +94,25 @@ const userSchema = new mongoose.Schema({
       userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' } // Reference to User model
     },
   ],
+   // Optional company profile details
+   companyProfile: {
+    businessName: { type: String, default: "" },
+    address: {
+      line1: { type: String, default: "" },
+      city: { type: String, default: "" },
+      state: { type: String, default: "" },
+      postal_code: { type: String, default: "" },
+      country: { type: String, default: "" },
+    },
+    metroArea: { type: String, default: "" },
+    officePhone: { type: String, default: "" },
+    cellPhone: { type: String, default: "" },
+    operatorLicense: { type: String, default: "" },
+    taxId: { type: String, default: "" },
+    area: { type: String, default: "" },
+    notification: { type: String, enum: ["email", "sms", "both"], default: "email" },
+    nlaMember: { type: String, enum: ["yes", "no"], default: "no" },
+  }
 }, { timestamps: true });
 
 // Create and export the User model

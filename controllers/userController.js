@@ -543,8 +543,59 @@ const getUserById = async (req, res) => {
     res.status(500).json({ message: "Error fetching user details", error });
   }
 };
+// @desc    Update company profile
+// @route   PUT /api/company/profile
+// @access  Private (Admin)
+const updateCompanyProfile = async (req, res) => {
+  try {
+    const {
+      businessName,
+      address,
+      metroArea,
+      officePhone,
+      cellPhone,
+      operatorLicense,
+      taxId,
+      area,
+      notification,
+      nlaMember,
+    } = req.body;
 
-module.exports = { getUserById };
+    const { id } = req.params;
+    // Find the user by ID
+    const user = await User.findById(id);
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Update company details
+    user.companyProfile.businessName = businessName || user.companyProfile.businessName;
+
+    user.companyProfile.address = {
+      line1: address?.line1 || user.companyProfile.address.line1,
+      city: address?.city || user.companyProfile.address.city,
+      state: address?.state || user.companyProfile.address.state,
+      postal_code: address?.postal_code || user.companyProfile.address.postal_code,
+      country: address?.country || user.companyProfile.address.country,
+    };
+    user.companyProfile.metroArea = metroArea || user.companyProfile.metroArea;
+    user.companyProfile.officePhone = officePhone || user.companyProfile.officePhone;
+    user.companyProfile.cellPhone = cellPhone || user.companyProfile.cellPhone;
+    user.companyProfile.operatorLicense = operatorLicense || user.companyProfile.operatorLicense;
+    user.companyProfile.taxId = taxId || user.companyProfile.taxId;
+    user.companyProfile.area = area || user.companyProfile.area;
+    user.companyProfile.notification = notification || user.companyProfile.notification;
+    user.companyProfile.nlaMember = nlaMember || user.companyProfile.nlaMember;
+    const updatedCompany = await User.save();
+    res.json({
+      message: "Company profile updated successfully",
+      company: updatedCompany,
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Error updating company profile", error });
+  }
+};
 
 module.exports = {
   registerUser,
@@ -564,5 +615,6 @@ module.exports = {
   searchReservation,
   getUserById,
   getAllReservations,
-  searchByPhone
+  searchByPhone,
+  updateCompanyProfile
 };

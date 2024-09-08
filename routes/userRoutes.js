@@ -16,6 +16,7 @@ const {
   searchReservation,
   getUserById,
   searchByPhone,
+  updateCompanyProfile,
 } = require('../controllers/userController');
 const { protect, admin } = require('../middlewares/authMiddleware');
 
@@ -44,5 +45,6 @@ router.post('/searchByPhone', searchByPhone);
 // router.route('/verify-password').post(verifyCurrentPassword);
 // User profile routes
 router.route('/profile/:id').put( updateUserProfile);
+router.route('/updateCompanyProfile/:id').put( updateCompanyProfile);
 
 module.exports = router;
