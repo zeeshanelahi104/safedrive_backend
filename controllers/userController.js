@@ -548,6 +548,7 @@ const getUserById = async (req, res) => {
 // @access  Private (Admin)
 const updateCompanyProfile = async (req, res) => {
   try {
+    const { id } = req.params; // Extract id from the URL parameters
     const {
       businessName,
       address,
@@ -561,7 +562,6 @@ const updateCompanyProfile = async (req, res) => {
       nlaMember,
     } = req.body;
 
-    const { id } = req.params;
     // Find the user by ID
     const user = await User.findById(id);
 
@@ -569,7 +569,7 @@ const updateCompanyProfile = async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    // Update company details
+    // Update the company profile details if provided, otherwise keep the existing ones
     user.companyProfile.businessName = businessName || user.companyProfile.businessName;
 
     user.companyProfile.address = {
@@ -579,6 +579,7 @@ const updateCompanyProfile = async (req, res) => {
       postal_code: address?.postal_code || user.companyProfile.address.postal_code,
       country: address?.country || user.companyProfile.address.country,
     };
+
     user.companyProfile.metroArea = metroArea || user.companyProfile.metroArea;
     user.companyProfile.officePhone = officePhone || user.companyProfile.officePhone;
     user.companyProfile.cellPhone = cellPhone || user.companyProfile.cellPhone;
@@ -587,15 +588,22 @@ const updateCompanyProfile = async (req, res) => {
     user.companyProfile.area = area || user.companyProfile.area;
     user.companyProfile.notification = notification || user.companyProfile.notification;
     user.companyProfile.nlaMember = nlaMember || user.companyProfile.nlaMember;
-    const updatedCompany = await User.save();
-    res.json({
+
+    // Save the updated user
+    const updatedCompany = await user.save(); // Save method to update the user record in DB
+
+    return res.json({
       message: "Company profile updated successfully",
       company: updatedCompany,
     });
   } catch (error) {
-    res.status(500).json({ message: "Error updating company profile", error });
+    return res.status(500).json({
+      message: "Error updating company profile",
+      error: error.message,
+    });
   }
 };
+
 
 module.exports = {
   registerUser,
