@@ -112,7 +112,15 @@ const userSchema = new mongoose.Schema({
     area: { type: String, default: "" },
     notification: { type: String, enum: ["email", "sms", "both"], default: "email" },
     nlaMember: { type: String, enum: ["yes", "no"], default: "no" },
-  }
+  },
+  vehiclesDetails: [
+    {
+      type: { type: String},
+      passengers: { type: Number},
+      numberOfVehicles: { type: Number},
+      images: [String], // Array of image URLs
+    },
+  ],
 }, { timestamps: true });
 
 // Create and export the User model

@@ -88,6 +88,28 @@ authUser = async (req, res) => {
 // @desc    Get user profile
 // @route   GET /api/users/profile
 // @access  Private
+// const getUserProfile = async (req, res) => {
+//   try {
+//     // Extract userId from request parameters
+//     const { id } = req.params;
+
+//     // Find the user by ID
+//     const user = await User.findById(id);
+
+//     if (user) {
+//       res.json({
+//         _id: user._id,
+//         firstName: user.firstName,
+//         lastName: user.lastName,
+//         email: user.email,
+//       });
+//     } else {
+//       res.status(404).json({ message: "User not found" });
+//     }
+//   } catch (error) {
+//     res.status(500).json({ message: "Error fetching user profile", error });
+//   }
+// };
 const getUserProfile = async (req, res) => {
   try {
     // Extract userId from request parameters
@@ -102,6 +124,17 @@ const getUserProfile = async (req, res) => {
         firstName: user.firstName,
         lastName: user.lastName,
         email: user.email,
+        phone: user.phone,
+        address: user.address,
+        billingDetails: user.billingDetails,
+        stripeCustomerId: user.stripeCustomerId,
+        paymentMethodId: user.paymentMethodId,
+        setupIntentClientSecret: user.setupIntentClientSecret,
+        role: user.role,
+        selectedReservations: user.selectedReservations,
+        companyProfile: user.companyProfile,
+        createdAt: user.createdAt,
+        updatedAt: user.updatedAt,
       });
     } else {
       res.status(404).json({ message: "User not found" });
@@ -279,12 +312,10 @@ createPaymentIntent = async (req, res) => {
     !customerName ||
     !customerAddress
   ) {
-    return res
-      .status(400)
-      .json({
-        error:
-          "Amount, customer ID, payment method ID, customer name, and customer address are required",
-      });
+    return res.status(400).json({
+      error:
+        "Amount, customer ID, payment method ID, customer name, and customer address are required",
+    });
   }
 
   if (amount <= 0) {
@@ -437,75 +468,84 @@ const resetPassword = async (req, res) => {
 };
 // Search Reservation Function
 const searchReservation = async (req, res) => {
-  if (req.method === 'POST') {
+  if (req.method === "POST") {
     const { lastName, email, phone } = req.body;
-    console.log('Received Request Body:', { lastName, email, phone });
+    console.log("Received Request Body:", { lastName, email, phone });
 
     try {
       const user = await User.findOne({
-        lastName: new RegExp(`^${lastName}$`, 'i'),
-        email: new RegExp(`^${email}$`, 'i'),
-        phone: new RegExp(`^${phone}$`, 'i'),
+        lastName: new RegExp(`^${lastName}$`, "i"),
+        email: new RegExp(`^${email}$`, "i"),
+        phone: new RegExp(`^${phone}$`, "i"),
       });
-      
-      console.log('Users found:', user);
+
+      console.log("Users found:", user);
 
       if (user.length === 0) {
-        console.log('No user found');
-        return res.status(404).json({ message: 'User not found' });
+        console.log("No user found");
+        return res.status(404).json({ message: "User not found" });
       }
 
       return res.status(200).json({ user: user });
     } catch (error) {
-      console.error('Error fetching user details:', error);
-      return res.status(500).json({ message: 'Error fetching user details', error: error.message || 'Unknown Error' });
+      console.error("Error fetching user details:", error);
+      return res
+        .status(500)
+        .json({
+          message: "Error fetching user details",
+          error: error.message || "Unknown Error",
+        });
     }
   } else {
-    return res.status(405).json({ message: 'Method Not Allowed' });
+    return res.status(405).json({ message: "Method Not Allowed" });
   }
 };
 // Search Reservation Function
 const searchByPhone = async (req, res) => {
-  if (req.method === 'POST') {
+  if (req.method === "POST") {
     const { phone } = req.body;
-    console.log('Received Request Body:', { phone });
+    console.log("Received Request Body:", { phone });
 
     try {
       const user = await User.findOne({
-        phone: new RegExp(`^${phone}$`, 'i'),
+        phone: new RegExp(`^${phone}$`, "i"),
       });
-      
-      console.log('Users found:', user);
+
+      console.log("Users found:", user);
 
       if (user.length === 0) {
-        console.log('No user found');
-        return res.status(404).json({ message: 'User not found' });
+        console.log("No user found");
+        return res.status(404).json({ message: "User not found" });
       }
 
       return res.status(200).json({ user: user });
     } catch (error) {
-      console.error('Error fetching user details:', error);
-      return res.status(500).json({ message: 'Error fetching user details', error: error.message || 'Unknown Error' });
+      console.error("Error fetching user details:", error);
+      return res
+        .status(500)
+        .json({
+          message: "Error fetching user details",
+          error: error.message || "Unknown Error",
+        });
     }
   } else {
-    return res.status(405).json({ message: 'Method Not Allowed' });
+    return res.status(405).json({ message: "Method Not Allowed" });
   }
 };
 
-
-
-
 const getAllReservations = async (req, res) => {
-  if (req.method === 'GET') {
+  if (req.method === "GET") {
     try {
       const reservations = await User.find({}); // Fetch all reservations
       return res.status(200).json({ reservations });
     } catch (error) {
-      console.error('Error fetching all reservations:', error);
-      return res.status(500).json({ message: 'Error fetching all reservations.' });
+      console.error("Error fetching all reservations:", error);
+      return res
+        .status(500)
+        .json({ message: "Error fetching all reservations." });
     }
   } else {
-    return res.status(405).json({ message: 'Method Not Allowed' });
+    return res.status(405).json({ message: "Method Not Allowed" });
   }
 };
 
@@ -561,7 +601,7 @@ const updateCompanyProfile = async (req, res) => {
       notification,
       nlaMember,
     } = req.body;
-
+    console.log("Requested Data: ", req.body);
     // Find the user by ID
     const user = await User.findById(id);
 
@@ -570,23 +610,28 @@ const updateCompanyProfile = async (req, res) => {
     }
 
     // Update the company profile details if provided, otherwise keep the existing ones
-    user.companyProfile.businessName = businessName || user.companyProfile.businessName;
+    user.companyProfile.businessName =
+      businessName || user.companyProfile.businessName;
 
     user.companyProfile.address = {
       line1: address?.line1 || user.companyProfile.address.line1,
       city: address?.city || user.companyProfile.address.city,
       state: address?.state || user.companyProfile.address.state,
-      postal_code: address?.postal_code || user.companyProfile.address.postal_code,
+      postal_code:
+        address?.postal_code || user.companyProfile.address.postal_code,
       country: address?.country || user.companyProfile.address.country,
     };
 
     user.companyProfile.metroArea = metroArea || user.companyProfile.metroArea;
-    user.companyProfile.officePhone = officePhone || user.companyProfile.officePhone;
+    user.companyProfile.officePhone =
+      officePhone || user.companyProfile.officePhone;
     user.companyProfile.cellPhone = cellPhone || user.companyProfile.cellPhone;
-    user.companyProfile.operatorLicense = operatorLicense || user.companyProfile.operatorLicense;
+    user.companyProfile.operatorLicense =
+      operatorLicense || user.companyProfile.operatorLicense;
     user.companyProfile.taxId = taxId || user.companyProfile.taxId;
     user.companyProfile.area = area || user.companyProfile.area;
-    user.companyProfile.notification = notification || user.companyProfile.notification;
+    user.companyProfile.notification =
+      notification || user.companyProfile.notification;
     user.companyProfile.nlaMember = nlaMember || user.companyProfile.nlaMember;
 
     // Save the updated user
@@ -603,7 +648,30 @@ const updateCompanyProfile = async (req, res) => {
     });
   }
 };
+const addOrUpdateVehicleDetails = async (req, res) => {
+  const { userId } = req.params; // Get userId from the URL parameters
+  const { vehicleData } = req.body; // Get vehicleData from the request body
 
+  try {
+    // Find the user by ID
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    // Add or update vehicle details
+    user.vehiclesDetails = vehicleData;
+
+    // Save the updated user document
+    await user.save();
+
+    return res.status(200).json({ message: 'Vehicle details updated successfully', user });
+  } catch (error) {
+    console.error('Error updating vehicle details:', error);
+    return res.status(500).json({ error: 'Server error' });
+  }
+};
 
 module.exports = {
   registerUser,
@@ -624,5 +692,6 @@ module.exports = {
   getUserById,
   getAllReservations,
   searchByPhone,
-  updateCompanyProfile
+  updateCompanyProfile,
+  addOrUpdateVehicleDetails
 };

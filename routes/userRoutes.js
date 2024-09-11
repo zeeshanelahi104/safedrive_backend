@@ -17,6 +17,7 @@ const {
   getUserById,
   searchByPhone,
   updateCompanyProfile,
+  addOrUpdateVehicleDetails,
 } = require('../controllers/userController');
 const { protect, admin } = require('../middlewares/authMiddleware');
 
@@ -46,5 +47,5 @@ router.post('/searchByPhone', searchByPhone);
 // User profile routes
 router.route('/profile/:id').put( updateUserProfile);
 router.route('/updateCompanyProfile/:id').put( updateCompanyProfile);
-
+router.put('/add-or-update-vehicle-details/:userId', addOrUpdateVehicleDetails);
 module.exports = router;
