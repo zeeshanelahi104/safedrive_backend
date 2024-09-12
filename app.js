@@ -11,7 +11,7 @@ app.use(express.json()); // For parsing JSON request bodies
 
 // Explicit CORS configuration
 const corsOptions = {
-  origin: ['http://localhost:3000', process.env.NEXT_PUBLIC_SITE_URL1,process.env.NEXT_PUBLIC_SITE_URL2], // Allow your frontend's origin in development and production
+  origin: ['http://localhost:3000', process.env.NEXT_PUBLIC_SITE_URL1,process.env.NEXT_PUBLIC_SITE_URL2, 'https://safedrive-backend-zvkw.onrender.com'], // Allow your frontend's origin in development and production
   methods: 'GET,POST,PUT,DELETE', // Allow specific HTTP methods
   credentials: true, // Allow cookies and other credentials
   optionsSuccessStatus: 200, // For legacy browsers support
