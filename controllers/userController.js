@@ -570,6 +570,8 @@ const getUserById = async (req, res) => {
         role: user.role,
         address: user.address, // Include address details
         billingDetails: user.billingDetails, // Include billing details
+        companyProfile: user.companyProfile,
+        vehiclesDetails: user.vehiclesDetails,
         stripeCustomerId: user.stripeCustomerId,
         paymentMethodId: user.paymentMethodId,
         selectedReservations: user.selectedReservations, // Include reservations
