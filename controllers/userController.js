@@ -133,6 +133,7 @@ const getUserProfile = async (req, res) => {
         role: user.role,
         selectedReservations: user.selectedReservations,
         companyProfile: user.companyProfile,
+        vehiclesDetails: user.vehiclesDetails,
         createdAt: user.createdAt,
         updatedAt: user.updatedAt,
       });
