@@ -110,7 +110,7 @@ const userSchema = new mongoose.Schema({
     operatorLicense: { type: String, default: "" },
     taxId: { type: String, default: "" },
     area: { type: String, default: "" },
-    notification: { type: String, enum: ["email", "sms", "both"], default: "email" },
+    notification: { type: String, enum: ["By E-mail", "By Text", "By E-mail and Text"], default: "y E-mail" },
     nlaMember: { type: String, enum: ["yes", "no"], default: "no" },
   },
   vehiclesDetails: [

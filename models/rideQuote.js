@@ -1,5 +1,4 @@
 const mongoose = require('mongoose');
-const selectedRideSchema = require('./selectedRideSchema'); // Import the selectedRideSchema
 
 // Define the LocationSchema
 const LocationSchema = new mongoose.Schema({
@@ -7,7 +6,13 @@ const LocationSchema = new mongoose.Schema({
   lat: { type: Number, required: true },
   lng: { type: Number, required: true },
 });
-
+const selectedRideSchema = new mongoose.Schema({
+  carName: { type: String, required: true },
+  baseRate: { type: Number, required: true },
+  donation: { type: Number, required: true },
+  totalRate: { type: Number, required: true },
+  imageUrl: { type: String, required: true },
+});
 // Define the RideQuoteSchema
 const RideQuoteSchema = new mongoose.Schema({
   pickup: { type: LocationSchema, required: true },
