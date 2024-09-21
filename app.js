@@ -36,7 +36,6 @@ app.get('/', (req, res) => {
 // Routes for user-related endpoints
 app.use('/api/user', userRoutes);
 app.use('/api/quotes', quoteRoutes);
-app.use('/api/customers', customerRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {

@@ -18,6 +18,8 @@ const {
   searchByPhone,
   updateCompanyProfile,
   addOrUpdateVehicleDetails,
+  getAllReservations,
+  getUsersByIds,
 } = require('../controllers/userController');
 const { protect, admin } = require('../middlewares/authMiddleware');
 
@@ -36,7 +38,9 @@ router.post('/create-checkout-session', protect, createCheckoutSession);
 router.post('/create-customer', protect, createCustomer);
 router.post('/create-payment-intent', protect, createPaymentIntent);
 router.post('/create-setup-intent', protect, createSetupIntent);
-router.get('/users', protect, admin, getAllUsers); // Admin route
+router.get('/users', getAllUsers); // Admin route
+router.get('/users', getUsersByIds); // Admin route
+router.get('/getAllReservations', getAllReservations); // Admin route
 // GET user by ID
 router.get('/:id', getUserById);
 router.route('/profile/:id').get(getUserProfile);

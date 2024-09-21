@@ -2,25 +2,27 @@
 
 const RideQuote = require("../models/rideQuote");
 
-// Get all quotes function
+// Get all ride quotes
 const getAllQuotes = async (req, res) => {
-  try {
-    // Fetch all quotes from the database
-    const quotes = await RideQuote.find();
-
-    // Return the quotes with a 200 status
-    res.status(200).json(quotes);
-  } catch (error) {
-    // Log the error for debugging purposes
-    console.error("Error fetching quotes:", error);
-
-    // Return a 500 status with an error message
-    res.status(500).json({
-      message:
-        error.message || "An unknown error occurred while fetching quotes",
-    });
-  }
-};
+    try {
+      // Fetch all ride quotes from the database
+      const quotes = await RideQuote.find();
+  
+      // Send a success response with the quotes data
+      res.status(200).json({
+        success: true,
+        data: quotes,
+      });
+    } catch (error) {
+      // Handle errors
+      console.error("Error fetching ride quotes: ", error);
+      res.status(500).json({
+        success: false,
+        message: "Failed to fetch ride quotes",
+        error: error.message,
+      });
+    }
+  };
 
 // Get a single quote by ID
 const getSingleQuote = async (req, res) => {

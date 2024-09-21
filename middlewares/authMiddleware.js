@@ -41,7 +41,7 @@ exports.protect = async (req, res, next) => {
 
 // Middleware to check if the authenticated user is an admin
 exports.admin = (req, res, next) => {
-  if (req.user && req.user.isAdmin) {
+  if (req.user && req.user.role === "admin") {
     // Proceed to the next middleware or route handler
     next();
   } else {

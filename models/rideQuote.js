@@ -1,45 +1,65 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
+const { Schema, model } = mongoose;
 
-// Define the LocationSchema
-const LocationSchema = new mongoose.Schema({
+// Define Location Schema
+const LocationSchema = new Schema({
   address: { type: String, required: false },
   lat: { type: Number, required: true },
   lng: { type: Number, required: true },
 });
-const selectedRideSchema = new mongoose.Schema({
+
+// Define Selected Ride Schema
+const selectedRideSchema = new Schema({
   carName: { type: String, required: true },
   baseRate: { type: Number, required: true },
   donation: { type: Number, required: true },
   totalRate: { type: Number, required: true },
   imageUrl: { type: String, required: true },
 });
-// Define the RideQuoteSchema
-const RideQuoteSchema = new mongoose.Schema({
-  pickup: { type: LocationSchema, required: true },
-  destination: { type: LocationSchema, required: true },
-  stop: { type: LocationSchema, required: true },
-  persons: { type: Number, required: true },
-  pickupDate: { type: String, required: true },
-  pickupTime: { type: String, required: true },
-  returnPickupTime: { type: String },
-  additionalInfo: { type: String },
-  rideType: { type: String, required: true },
-  mapLocation: { type: LocationSchema, required: true },
-  selectedRide: {
-    type: selectedRideSchema, // Use the imported selectedRideSchema
-    required: false,
-  },
-}, {
-  timestamps: true,
-});
 
-// Create and export the RideQuote model
+// Define Ride Quote Schema
+const RideQuoteSchema = new Schema(
+  {
+    pickup: { type: LocationSchema, required: true },
+    destination: { type: LocationSchema, required: true },
+    stop: { type: LocationSchema, required: true },
+    persons: { type: Number, required: true },
+    pickupDate: { type: String, required: true },
+    pickupTime: { type: String, required: true },
+    returnPickupTime: { type: String },
+    additionalInfo: { type: String },
+    rideType: { type: String, required: true },
+    notificationType: {
+      type: String,
+      enum: ["email", "text", "email and text"],
+      default: "email",
+    },
+    quoteType: {
+      type: String,
+      enum: ["incomplete", "completed", "abandoned"],
+      default: "incomplete", // Default when a quote is first created
+    },
+    status: { type: String, default: "pending" },
+    paymentMethod: { type: String, default: "cash" },
+    mapLocation: { type: LocationSchema, required: true },
+    selectedRide: {
+      type: selectedRideSchema,
+      required: false,
+    },
+    userId: { type: String, required: true }
+  },
+  {
+    timestamps: true,
+  }
+);
+
+// Create or retrieve RideQuote model
 let RideQuote;
 
 try {
-  RideQuote = mongoose.model('RideQuote');
+  RideQuote = model("RideQuote");
 } catch (e) {
-  RideQuote = mongoose.model('RideQuote', RideQuoteSchema);
+  RideQuote = model("RideQuote", RideQuoteSchema);
 }
 
 module.exports = RideQuote;

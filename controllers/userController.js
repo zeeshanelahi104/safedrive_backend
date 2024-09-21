@@ -474,33 +474,36 @@ const searchReservation = async (req, res) => {
     console.log("Received Request Body:", { lastName, email, phone });
 
     try {
+      // Using findOne to search for a single user
       const user = await User.findOne({
-        lastName: new RegExp(`^${lastName}$`, "i"),
+        lastName: new RegExp(`^${lastName}$`, "i"), // Case-insensitive match
         email: new RegExp(`^${email}$`, "i"),
         phone: new RegExp(`^${phone}$`, "i"),
       });
 
-      console.log("Users found:", user);
+      console.log("User found:", user);
 
-      if (user.length === 0) {
+      // If no user is found, return a 404 response
+      if (!user) {
         console.log("No user found");
         return res.status(404).json({ message: "User not found" });
       }
 
-      return res.status(200).json({ user: user });
+      // Return the found user
+      return res.status(200).json({ user });
     } catch (error) {
       console.error("Error fetching user details:", error);
-      return res
-        .status(500)
-        .json({
-          message: "Error fetching user details",
-          error: error.message || "Unknown Error",
-        });
+      return res.status(500).json({
+        message: "Error fetching user details",
+        error: error.message || "Unknown Error",
+      });
     }
   } else {
+    // Method not allowed
     return res.status(405).json({ message: "Method Not Allowed" });
   }
 };
+
 // Search Reservation Function
 const searchByPhone = async (req, res) => {
   if (req.method === "POST") {
@@ -522,12 +525,10 @@ const searchByPhone = async (req, res) => {
       return res.status(200).json({ user: user });
     } catch (error) {
       console.error("Error fetching user details:", error);
-      return res
-        .status(500)
-        .json({
-          message: "Error fetching user details",
-          error: error.message || "Unknown Error",
-        });
+      return res.status(500).json({
+        message: "Error fetching user details",
+        error: error.message || "Unknown Error",
+      });
     }
   } else {
     return res.status(405).json({ message: "Method Not Allowed" });
@@ -581,6 +582,27 @@ const getUserById = async (req, res) => {
       });
     } else {
       res.status(404).json({ message: "User not found" });
+    }
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching user details", error });
+  }
+};
+const getUsersByIds = async (req, res) => {
+  try {
+    const { ids } = req.query;
+
+    if (!ids) {
+      return res.status(400).json({ message: "User IDs are required." });
+    }
+
+    const idsArray = Array.isArray(ids) ? ids : ids.split(",");
+    console.log("idsArray: ", idsArray);
+    const users = await User.find({ _id: { $in: idsArray } });
+    console.log("users", users);
+    if (users.length > 0) {
+      res.json(users);
+    } else {
+      res.status(404).json({ message: "No users found." });
     }
   } catch (error) {
     res.status(500).json({ message: "Error fetching user details", error });
@@ -660,7 +682,7 @@ const addOrUpdateVehicleDetails = async (req, res) => {
     const user = await User.findById(userId);
 
     if (!user) {
-      return res.status(404).json({ error: 'User not found' });
+      return res.status(404).json({ error: "User not found" });
     }
 
     // Add or update vehicle details
@@ -669,10 +691,12 @@ const addOrUpdateVehicleDetails = async (req, res) => {
     // Save the updated user document
     await user.save();
 
-    return res.status(200).json({ message: 'Vehicle details updated successfully', user });
+    return res
+      .status(200)
+      .json({ message: "Vehicle details updated successfully", user });
   } catch (error) {
-    console.error('Error updating vehicle details:', error);
-    return res.status(500).json({ error: 'Server error' });
+    console.error("Error updating vehicle details:", error);
+    return res.status(500).json({ error: "Server error" });
   }
 };
 
@@ -693,8 +717,9 @@ module.exports = {
   resetPassword,
   searchReservation,
   getUserById,
+  getUsersByIds,
   getAllReservations,
   searchByPhone,
   updateCompanyProfile,
-  addOrUpdateVehicleDetails
+  addOrUpdateVehicleDetails,
 };
