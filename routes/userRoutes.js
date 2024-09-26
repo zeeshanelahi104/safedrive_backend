@@ -35,7 +35,7 @@ router.post('/find-account', findAccount);
 // Protected routes
 router.post('/change-password', protect, changePassword);
 router.post('/create-checkout-session', protect, createCheckoutSession);
-router.post('/create-customer', protect, createCustomer);
+router.post('/create-customer', createCustomer);
 router.post('/create-payment-intent', protect, createPaymentIntent);
 router.post('/create-setup-intent', protect, createSetupIntent);
 router.get('/users', getAllUsers); // Admin route

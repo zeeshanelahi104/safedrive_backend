@@ -1,18 +1,22 @@
 const jwt = require("jsonwebtoken");
 const User = require("../models/user");
-const Stripe = require("stripe");
 const { encrypt, decrypt } = require("../utils/encryption");
 const nodemailer = require("nodemailer");
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-  apiVersion: "2024-06-20",
+// const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+// const stripe = require('stripe')('sk_test_51OfdGbSICzhlc2ExXZTGWX1RAoiXt2BpG7wtOK0UkcEBVmnHptdlWp9wSE9dgfmZdTXn4aibnCr4MbOfOfYA1D1r00nFEOOfWQ');
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY, {
+  apiVersion: '2020-08-27', // Replace with the version you're using
 });
+
+
 // Function to generate a JWT token
 const generateToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, {
     expiresIn: "1h",
   });
 };
+
 
 // @desc    Register a new user
 // @route   POST /api/users/register
@@ -88,28 +92,6 @@ authUser = async (req, res) => {
 // @desc    Get user profile
 // @route   GET /api/users/profile
 // @access  Private
-// const getUserProfile = async (req, res) => {
-//   try {
-//     // Extract userId from request parameters
-//     const { id } = req.params;
-
-//     // Find the user by ID
-//     const user = await User.findById(id);
-
-//     if (user) {
-//       res.json({
-//         _id: user._id,
-//         firstName: user.firstName,
-//         lastName: user.lastName,
-//         email: user.email,
-//       });
-//     } else {
-//       res.status(404).json({ message: "User not found" });
-//     }
-//   } catch (error) {
-//     res.status(500).json({ message: "Error fetching user profile", error });
-//   }
-// };
 const getUserProfile = async (req, res) => {
   try {
     // Extract userId from request parameters
@@ -278,6 +260,8 @@ createCheckoutSession = async (req, res) => {
 };
 
 createCustomer = async (req, res) => {
+  console.log('Stripe Secret Key:', process.env.STRIPE_SECRET_KEY); // Make sure it logs correctly (remove it afterward for security)
+
   const { email, name } = req.body;
 
   if (!email) {

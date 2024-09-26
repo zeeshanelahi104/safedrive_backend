@@ -1,10 +1,10 @@
+const dotenv = require('dotenv');
+dotenv.config();
 const express = require('express');
 const cors = require('cors');
 const morgan = require('morgan');
 const userRoutes = require('./routes/userRoutes');
-const customerRoutes = require('./routes/customerRoutes');
 const quoteRoutes = require('./routes/quoteRoutes');
-
 const app = express();
 
 // Middleware
