@@ -34,23 +34,43 @@ const getSingleQuote = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
-
-// Search quotes by vehicle type and state
-// const searchQuotes = async (req, res) => {
-//   try {
-//     const { vehicleType, state } = req.query;
-
-//     // Build query object
-//     const query = {};
-//     if (vehicleType) query["selectedRide.vehicleType"] = vehicleType;
-//     if (state) query["selectedRide.state"] = state;
-
-//     const quotes = await RideQuote.find(query);
-//     res.status(200).json(quotes);
-//   } catch (error) {
-//     res.status(500).json({ message: error.message });
-//   }
-// };
+const updateQuote = async (req, res) => {
+    try {
+      const { id } = req.params; // Get the quote ID from the request parameters
+      const updateData = req.body; // Get the updated data from the request body
+  
+      // Validate the presence of update data
+      if (Object.keys(updateData).length === 0) {
+        return res.status(400).json({ message: "No data provided for update" });
+      }
+  
+      // Find the quote by ID and update it with the provided data
+      const updatedQuote = await RideQuote.findByIdAndUpdate(
+        id,
+        updateData,
+        { new: true } // Return the updated document
+      );
+  
+      // Check if the quote was found and updated
+      if (!updatedQuote) {
+        return res.status(404).json({ message: "Quote not found" });
+      }
+  
+      // Send the updated quote back as a response
+      res.status(200).json({
+        success: true,
+        data: updatedQuote,
+      });
+    } catch (error) {
+      console.error("Error updating quote:", error);
+      res.status(500).json({
+        success: false,
+        message: "Failed to update quote",
+        error: error.message,
+      });
+    }
+  };
+  
 const searchQuotes = async (req, res) => {
     try {
         const { vehicleType, rideType } = req.query;
@@ -191,6 +211,7 @@ const searchQuotesByDate = async (req, res) => {
 module.exports = {
   getAllQuotes,
   getSingleQuote,
+  updateQuote,
   searchQuotes,
   searchQuotesByDate
 };

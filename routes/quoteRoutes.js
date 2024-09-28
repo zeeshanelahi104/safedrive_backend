@@ -1,6 +1,6 @@
 // quoteRoutes.js
 const express = require('express');
-const { getSingleQuote, getAllQuotes, searchQuotes, searchQuotesByDate } = require('../controllers/quoteController');
+const { getSingleQuote, getAllQuotes, searchQuotes, searchQuotesByDate, updateQuote } = require('../controllers/quoteController');
 const router = express.Router();
 
 // Route to get all quotes
@@ -13,5 +13,6 @@ router.post('/searchByDate', searchQuotesByDate);
 
 // Route to get a single quote by ID
 router.get('/:id', getSingleQuote);
+router.put('/:id', updateQuote);
 
 module.exports = router;

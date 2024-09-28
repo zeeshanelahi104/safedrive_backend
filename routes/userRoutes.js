@@ -20,6 +20,7 @@ const {
   addOrUpdateVehicleDetails,
   getAllReservations,
   getUsersByIds,
+  getPaymentMethod,
 } = require('../controllers/userController');
 const { protect, admin } = require('../middlewares/authMiddleware');
 
@@ -37,7 +38,8 @@ router.post('/change-password', protect, changePassword);
 router.post('/create-checkout-session', protect, createCheckoutSession);
 router.post('/create-customer', createCustomer);
 router.post('/create-payment-intent', protect, createPaymentIntent);
-router.post('/create-setup-intent', protect, createSetupIntent);
+router.post('/create-setup-intent', createSetupIntent);
+router.post('/get-payment-method', getPaymentMethod);
 router.get('/users', getAllUsers); // Admin route
 router.get('/users', getUsersByIds); // Admin route
 router.get('/getAllReservations', getAllReservations); // Admin route

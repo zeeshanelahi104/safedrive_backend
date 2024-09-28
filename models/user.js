@@ -88,10 +88,58 @@ const userSchema = new mongoose.Schema({
           donation: { type: Number, required: true },
           totalRate: { type: Number, required: true },
           imageUrl: { type: String, required: true },
-        },
+          rideStatus: {
+            type: String,
+            enum: ["Pending","Accepted", "Offered"], // Add any other statuses as needed
+            default: "Pending", // Set a default status if necessary
+          },        },
       },
       paymentIntentId: { type: String },
       userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' } // Reference to User model
+    },
+  ],
+  quotes: [
+    {
+      type: {
+        pickup: {
+          lat: { type: Number, required: true },
+          lng: { type: Number, required: true },
+          address: { type: String },
+        },
+        destination: {
+          lat: { type: Number, required: true },
+          lng: { type: Number, required: true },
+          address: { type: String },
+        },
+        stop: {
+          lat: { type: Number },
+          lng: { type: Number },
+          address: { type: String },
+        },
+        persons: { type: Number, required: true },
+        pickupDate: { type: String, required: true },
+        pickupTime: { type: String, required: true },
+        returnPickupTime: { type: String },
+        additionalInfo: { type: String },
+        rideType: { type: String, required: true },
+        notificationType: { type: String, required: true },
+        status: { type: String, enum: ["Pending", "Confirmed", "Previous"], default: "Pending" },
+        paymentMethod: { type: String },
+        mapLocation: {
+          lat: { type: Number, required: true },
+          lng: { type: Number, required: true },
+          address: { type: String },
+        },
+        selectedRide: {
+          carName: { type: String, required: true },
+          baseRate: { type: Number, required: true },
+          donation: { type: Number, required: true },
+          totalRate: { type: Number, required: true },
+          imageUrl: { type: String, required: true },
+          rideStatus: { type: String, required: true },
+        },
+      },  // Use the RideQuoteSchema here
+      required: false,
     },
   ],
    // Optional company profile details

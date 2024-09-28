@@ -21,44 +21,87 @@ const generateToken = (id) => {
 // @desc    Register a new user
 // @route   POST /api/users/register
 // @access  Public
-registerUser = async (req, res) => {
-  const { firstName, lastName, email, password, phone, role } = req.body;
-  console.log("Request", req);
-  if (!firstName || !lastName || !email || !password || !phone || !role) {
+const registerUser = async (req, res) => {
+  const {
+    firstName,
+    lastName,
+    email,
+    password,
+    phone,
+    role, // Assuming role is still required
+    paymentMethodId,
+    stripeCustomerId,
+    setupIntentClientSecret,
+    address,
+    billingDetails
+  } = req.body;
+
+  // Validate required fields
+  if (
+    !firstName ||
+    !lastName ||
+    !email ||
+    !password ||
+    !phone ||
+    !role || // Assuming role is still required
+    !paymentMethodId ||
+    !stripeCustomerId ||
+    !setupIntentClientSecret ||
+    !address ||
+    !address.line1 || !address.city || !address.state || !address.postal_code || !address.country ||
+    !billingDetails ||
+    !billingDetails.cardHolderName || !billingDetails.cardType || !billingDetails.expirationDate || !billingDetails.last4
+  ) {
     return res.status(400).json({ message: "All fields are required" });
   }
 
   try {
-    const userExists = await User.findOne({ email });
+    // Check if a user with the provided email already exists
+    const existingUser = await User.findOne({ email });
 
-    if (userExists) {
-      return res.status(400).json({ message: "User already exists" });
+    if (existingUser) {
+      return res.status(400).json({ error: "User with this email is already registered" });
     }
 
+    // Encrypt the password before saving it to the database
     const hashedPassword = encrypt(password);
 
-    const user = await User.create({
+    // Create a new user document with the provided data
+    const newUser = new User({
       firstName,
       lastName,
       email,
-      phone,
-      role,
       password: hashedPassword,
+      phone,
+      role, // Saving role
+      stripeCustomerId,
+      setupIntentClientSecret,
+      paymentMethodId,
+      address, // Save the address in the user document
+      billingDetails // Save billingDetails in the user document
     });
-    console.log("User", user);
+
+    // Save the new user document to the database
+    await newUser.save();
+
+    // Respond with a success message along with user details and a token
     res.status(201).json({
-      _id: user._id,
-      firstName: user.firstName,
-      lastName: user.lastName,
-      email: user.email,
-      phone: user.phone,
-      role: user.role,
-      token: generateToken(user._id),
+      _id: newUser._id,
+      firstName: newUser.firstName,
+      lastName: newUser.lastName,
+      email: newUser.email,
+      phone: newUser.phone,
+      role: newUser.role, // Assuming role is still required in response
+      address: newUser.address,
+      billingDetails: newUser.billingDetails,
+      token: generateToken(newUser._id),
     });
   } catch (error) {
-    res.status(500).json({ message: "Error registering user", error });
+    console.error('Error:', error);
+    res.status(500).json({ error: "Error registering user" });
   }
 };
+
 
 // @desc    Authenticate user & get token
 // @route   POST /api/users/login
@@ -340,6 +383,7 @@ createSetupIntent = async (req, res) => {
   try {
     const setupIntent = await stripe.setupIntents.create({
       customer: stripeCustomerId,
+      payment_method_types: ['card'], 
       usage: "off_session",
     });
 
@@ -349,7 +393,27 @@ createSetupIntent = async (req, res) => {
     res.status(500).json({ error: "Error creating setup intent." });
   }
 };
+// Function to retrieve payment method details from Stripe
+const getPaymentMethod = async (req, res) => {
+  try {
+    // Extract paymentMethodId from request body
+    const { paymentMethodId } = req.body;
 
+    if (!paymentMethodId) {
+      return res.status(400).json({ error: "Payment Method ID is required" });
+    }
+
+    // Fetch payment method details from Stripe using the provided paymentMethodId
+    const paymentMethod = await stripe.paymentMethods.retrieve(paymentMethodId);
+
+    // Respond with the payment method details
+    return res.status(200).json({ paymentMethod });
+  } catch (error) {
+    // Handle errors and respond with appropriate message
+    console.error("Stripe Error:", error);
+    return res.status(500).json({ error: error.message });
+  }
+};
 findAccount = async (req, res) => {
   const { email, firstName, lastName } = req.body;
 
@@ -696,6 +760,7 @@ module.exports = {
   createCustomer,
   createPaymentIntent,
   createSetupIntent,
+  getPaymentMethod,
   findAccount,
   forgotPassword,
   resetPassword,
