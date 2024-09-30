@@ -5,10 +5,9 @@ const nodemailer = require("nodemailer");
 
 // const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 // const stripe = require('stripe')('sk_test_51OfdGbSICzhlc2ExXZTGWX1RAoiXt2BpG7wtOK0UkcEBVmnHptdlWp9wSE9dgfmZdTXn4aibnCr4MbOfOfYA1D1r00nFEOOfWQ');
-const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY, {
-  apiVersion: '2024-06-20', // Replace with the version you're using
+const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY, {
+  apiVersion: "2024-06-20", // Replace with the version you're using
 });
-
 
 // Function to generate a JWT token
 const generateToken = (id) => {
@@ -17,12 +16,11 @@ const generateToken = (id) => {
   });
 };
 
-
 // @desc    Register a new user
 // @route   POST /api/users/register
 // @access  Public
 const registerUser = async (req, res) => {
-  console.log("req: ", req.body)
+  console.log("req: ", req.body);
   const {
     firstName,
     lastName,
@@ -34,7 +32,7 @@ const registerUser = async (req, res) => {
     stripeCustomerId,
     setupIntentClientSecret,
     address,
-    billingDetails
+    billingDetails,
   } = req.body;
 
   // Validate required fields
@@ -49,9 +47,16 @@ const registerUser = async (req, res) => {
     !stripeCustomerId ||
     !setupIntentClientSecret ||
     !address ||
-    !address.line1 || !address.city || !address.state || !address.postal_code || !address.country ||
+    !address.line1 ||
+    !address.city ||
+    !address.state ||
+    !address.postal_code ||
+    !address.country ||
     !billingDetails ||
-    !billingDetails.cardHolderName || !billingDetails.cardType || !billingDetails.expirationDate || !billingDetails.last4
+    !billingDetails.cardHolderName ||
+    !billingDetails.cardType ||
+    !billingDetails.expirationDate ||
+    !billingDetails.last4
   ) {
     return res.status(400).json({ message: "All fields are required" });
   }
@@ -61,7 +66,9 @@ const registerUser = async (req, res) => {
     const existingUser = await User.findOne({ email });
 
     if (existingUser) {
-      return res.status(400).json({ error: "User with this email is already registered" });
+      return res
+        .status(400)
+        .json({ error: "User with this email is already registered" });
     }
 
     // Encrypt the password before saving it to the database
@@ -79,7 +86,7 @@ const registerUser = async (req, res) => {
       setupIntentClientSecret,
       paymentMethodId,
       address, // Save the address in the user document
-      billingDetails // Save billingDetails in the user document
+      billingDetails, // Save billingDetails in the user document
     });
 
     // Save the new user document to the database
@@ -98,11 +105,10 @@ const registerUser = async (req, res) => {
       token: generateToken(newUser._id),
     });
   } catch (error) {
-    console.error('Error:', error);
+    console.error("Error:", error);
     res.status(500).json({ error: "Error registering user" });
   }
 };
-
 
 // @desc    Authenticate user & get token
 // @route   POST /api/users/login
@@ -304,7 +310,7 @@ createCheckoutSession = async (req, res) => {
 };
 
 createCustomer = async (req, res) => {
-  console.log('Stripe Secret Key:', process.env.STRIPE_SECRET_KEY); // Make sure it logs correctly (remove it afterward for security)
+  console.log("Stripe Secret Key:", process.env.STRIPE_SECRET_KEY); // Make sure it logs correctly (remove it afterward for security)
 
   const { email, name } = req.body;
 
@@ -375,10 +381,9 @@ createPaymentIntent = async (req, res) => {
 };
 
 createSetupIntent = async (req, res) => {
-
   const { stripeCustomerId } = req.body;
 
-  if (!stripeCustomerId) {                                       
+  if (!stripeCustomerId) {
     return res.status(400).json({ error: "Customer ID is required" });
   }
 
@@ -395,7 +400,6 @@ createSetupIntent = async (req, res) => {
     res.status(500).json({ error: "Error creating setup intent." });
   }
 };
-
 
 // Function to retrieve payment method details from Stripe
 const getPaymentMethod = async (req, res) => {
@@ -751,44 +755,89 @@ const addOrUpdateVehicleDetails = async (req, res) => {
     return res.status(500).json({ error: "Server error" });
   }
 };
- const updateUserData = async (req, res) => {
-  const { userId } = req.params; // Get user ID from request parameters
-  const userData = req.body; // Get user data from request body
-  try {
-    const updatedUser = await User.findByIdAndUpdate(userId, userData, { new: true }); // Update user data
-    if (!updatedUser) {
-      return res.status(404).json({ message: 'User not found' }); // Handle user not found
-    }
-    res.status(200).json(updatedUser); // Return updated user data
-  } catch (error) {
-    console.error('Error updating user data:', error);
-    res.status(500).json({ message: 'Internal server error', error }); // Handle server error
-  }
-};
-const updateDriverData = async (req, res) => {
-  const { driverId } = req.params; // Get driver ID from request parameters
-  const driverData = req.body; // Get driver data from request body
-  const newReservation = driverData.selectedReservations[0]; // Extract the new reservation
+const updateUserData = async (req, res) => {
+  const { userId } = req.params;
+  const userData = req.body;
+  const newReservation = userData.selectedReservations[0];
 
   try {
-    // Check if the reservation already exists based on reservation._id
+    const existingUser = await User.findById(userId);
+
+    if (!existingUser) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const reservationExists = existingUser.selectedReservations.some(
+      (r) =>
+        r?.reservation?._id?.toString() ===
+        newReservation?.reservation?._id?.toString()
+    );
+
+    if (reservationExists) {
+      return res.status(400).json({ message: "Reservation already accepted" });
+    }
+
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      {
+        $push: {
+          selectedReservations: {
+            reservation: newReservation.reservation,
+            rideStatus: newReservation.rideStatus,
+          },
+        },
+      },
+      { new: true }
+    );
+
+    res.status(200).json(updatedUser);
+  } catch (error) {
+    console.error("Error updating user data:", error);
+    res.status(500).json({ message: "Internal server error", error });
+  }
+};
+
+const updateDriverData = async (req, res) => {
+  const { driverId } = req.params;
+  const driverData = req.body;
+  const newReservation = driverData.selectedReservations[0];
+
+  try {
+    const existingDriver = await User.findById(driverId);
+
+    if (!existingDriver) {
+      return res.status(404).json({ message: "Driver not found" });
+    }
+
+    const reservationExists = existingDriver.selectedReservations.some(
+      (r) =>
+        r?.reservation?._id?.toString() ===
+        newReservation?.reservation?._id?.toString()
+    );
+
+    if (reservationExists) {
+      return res.status(400).json({ message: "Reservation already exists" });
+    }
+
     const updatedDriver = await User.findByIdAndUpdate(
       driverId,
       {
-        // Use $addToSet to ensure no duplicates in the selectedReservations array
-        $addToSet: { selectedReservations: { reservation: newReservation.reservation, rideStatus: newReservation.rideStatus } }
+        $push: {
+          selectedReservations: {
+            reservation: newReservation.reservation,
+            rideStatus: newReservation.rideStatus,
+            userId: newReservation.reservation.userId, // storing userId
+            reservationId: newReservation.reservation._id,
+          },
+        },
       },
-      { new: true, upsert: true } // Create if doesn't exist, return updated doc
+      { new: true }
     );
 
-    if (!updatedDriver) {
-      return res.status(404).json({ message: 'Driver not found' }); // Handle user not found
-    }
-
-    res.status(200).json(updatedDriver); // Return updated driver data
+    res.status(200).json(updatedDriver);
   } catch (error) {
-    console.error('Error updating driver data:', error);
-    res.status(500).json({ message: 'Internal server error', error }); // Handle server error
+    console.error("Error updating driver data:", error);
+    res.status(500).json({ message: "Internal server error", error });
   }
 };
 

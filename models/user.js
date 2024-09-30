@@ -97,6 +97,8 @@ const userSchema = new mongoose.Schema(
           enum: ["Pending", "Accepted", "Offered"], // Add any other statuses as needed
           default: "Pending", // Set a default status if necessary
         },
+        userId: { type: mongoose.Schema.Types.ObjectId, ref: "User" }, // Add userId
+        reservationId: { type: mongoose.Schema.Types.ObjectId },
       },
     ],
     quotes: [
