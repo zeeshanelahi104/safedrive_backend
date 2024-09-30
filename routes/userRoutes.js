@@ -21,6 +21,8 @@ const {
   getAllReservations,
   getUsersByIds,
   getPaymentMethod,
+  updateUserData,
+  updateDriverData,
 } = require('../controllers/userController');
 const { protect, admin } = require('../middlewares/authMiddleware');
 
@@ -52,6 +54,8 @@ router.post('/searchByPhone', searchByPhone);
 // router.route('/verify-password').post(verifyCurrentPassword);
 // User profile routes
 router.route('/profile/:id').put( updateUserProfile);
+router.route('/userProfile/:userId').put( updateUserData);
+router.route('/driverProfile/:driverId').put( updateDriverData);
 router.route('/updateCompanyProfile/:id').put( updateCompanyProfile);
 router.put('/add-or-update-vehicle-details/:userId', addOrUpdateVehicleDetails);
 module.exports = router;

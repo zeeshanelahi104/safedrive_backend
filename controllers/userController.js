@@ -6,7 +6,7 @@ const nodemailer = require("nodemailer");
 // const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 // const stripe = require('stripe')('sk_test_51OfdGbSICzhlc2ExXZTGWX1RAoiXt2BpG7wtOK0UkcEBVmnHptdlWp9wSE9dgfmZdTXn4aibnCr4MbOfOfYA1D1r00nFEOOfWQ');
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY, {
-  apiVersion: '2020-08-27', // Replace with the version you're using
+  apiVersion: '2024-06-20', // Replace with the version you're using
 });
 
 
@@ -22,6 +22,7 @@ const generateToken = (id) => {
 // @route   POST /api/users/register
 // @access  Public
 const registerUser = async (req, res) => {
+  console.log("req: ", req.body)
   const {
     firstName,
     lastName,
@@ -218,7 +219,7 @@ const updateUserProfile = async (req, res) => {
   }
 };
 
-const verifypassword = async (req, res) => {
+const verifyPassword = async (req, res) => {
   const { userId, password } = req.body;
   try {
     const user = await User.findById(userId);
@@ -374,16 +375,17 @@ createPaymentIntent = async (req, res) => {
 };
 
 createSetupIntent = async (req, res) => {
+
   const { stripeCustomerId } = req.body;
 
-  if (!stripeCustomerId) {
+  if (!stripeCustomerId) {                                       
     return res.status(400).json({ error: "Customer ID is required" });
   }
 
   try {
     const setupIntent = await stripe.setupIntents.create({
       customer: stripeCustomerId,
-      payment_method_types: ['card'], 
+      // payment_method_types: ['card'],
       usage: "off_session",
     });
 
@@ -393,6 +395,8 @@ createSetupIntent = async (req, res) => {
     res.status(500).json({ error: "Error creating setup intent." });
   }
 };
+
+
 // Function to retrieve payment method details from Stripe
 const getPaymentMethod = async (req, res) => {
   try {
@@ -747,13 +751,55 @@ const addOrUpdateVehicleDetails = async (req, res) => {
     return res.status(500).json({ error: "Server error" });
   }
 };
+ const updateUserData = async (req, res) => {
+  const { userId } = req.params; // Get user ID from request parameters
+  const userData = req.body; // Get user data from request body
+  try {
+    const updatedUser = await User.findByIdAndUpdate(userId, userData, { new: true }); // Update user data
+    if (!updatedUser) {
+      return res.status(404).json({ message: 'User not found' }); // Handle user not found
+    }
+    res.status(200).json(updatedUser); // Return updated user data
+  } catch (error) {
+    console.error('Error updating user data:', error);
+    res.status(500).json({ message: 'Internal server error', error }); // Handle server error
+  }
+};
+const updateDriverData = async (req, res) => {
+  const { driverId } = req.params; // Get driver ID from request parameters
+  const driverData = req.body; // Get driver data from request body
+  const newReservation = driverData.selectedReservations[0]; // Extract the new reservation
+
+  try {
+    // Check if the reservation already exists based on reservation._id
+    const updatedDriver = await User.findByIdAndUpdate(
+      driverId,
+      {
+        // Use $addToSet to ensure no duplicates in the selectedReservations array
+        $addToSet: { selectedReservations: { reservation: newReservation.reservation, rideStatus: newReservation.rideStatus } }
+      },
+      { new: true, upsert: true } // Create if doesn't exist, return updated doc
+    );
+
+    if (!updatedDriver) {
+      return res.status(404).json({ message: 'Driver not found' }); // Handle user not found
+    }
+
+    res.status(200).json(updatedDriver); // Return updated driver data
+  } catch (error) {
+    console.error('Error updating driver data:', error);
+    res.status(500).json({ message: 'Internal server error', error }); // Handle server error
+  }
+};
 
 module.exports = {
   registerUser,
   authUser,
   getUserProfile,
   updateUserProfile,
-  verifypassword,
+  updateUserData,
+  updateDriverData,
+  verifyPassword,
   getAllUsers,
   changePassword,
   createCheckoutSession,

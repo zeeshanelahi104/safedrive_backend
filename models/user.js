@@ -1,177 +1,187 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
 // Define the userSchema
-const userSchema = new mongoose.Schema({
-  email: {
-    type: String,
-    required: true,
-    unique: true,
-  },
-  password: {
-    type: String,
-    required: true,
-  },
-  firstName: {
-    type: String,
-    required: true,
-  },
-  lastName: {
-    type: String,
-    required: true,
-  },
-  phone: {
-    type: String,
-    required: true,
-  },
-  address: {
-    line1: { type: String },
-    city: { type: String },
-    state: { type: String },
-    postal_code: { type: String },
-    country: { type: String },
-  },
-  billingDetails: {
-    cardHolderName: { type: String},
-    cardType: { type: String},
-    expirationDate: { type: String},
-    last4: { type: String},
-  },
-  stripeCustomerId: {
-    type: String,
-  },
-  paymentMethodId: {
-    type: String,
-  },
-  setupIntentClientSecret: {
-    type: String,
-  },
-  role: {
-    type: String,
-    enum: ["user", "driver", "admin"],
-    default: "user",
-  },
-  selectedReservations: [
-    {
-      reservation: {
-        pickup: {
-          lat: { type: Number, required: true },
-          lng: { type: Number, required: true },
-          address: { type: String },
-        },
-        destination: {
-          lat: { type: Number, required: true },
-          lng: { type: Number, required: true },
-          address: { type: String },
-        },
-        stop: {
-          lat: { type: Number },
-          lng: { type: Number },
-          address: { type: String },
-        },
-        persons: { type: Number, required: true },
-        pickupDate: { type: String, required: true },
-        pickupTime: { type: String, required: true },
-        returnPickupTime: { type: String },
-        additionalInfo: { type: String },
-        rideType: { type: String, required: true },
-        notificationType: { type: String, required: true },
-        status: { type: String },
-        paymentMethod: { type: String },
-        mapLocation: {
-          lat: { type: Number, required: true },
-          lng: { type: Number, required: true },
-          address: { type: String },
-        },
-        selectedRide: {
-          carName: { type: String, required: true },
-          baseRate: { type: Number, required: true },
-          donation: { type: Number, required: true },
-          totalRate: { type: Number, required: true },
-          imageUrl: { type: String, required: true },
-          rideStatus: {
-            type: String,
-            enum: ["Pending","Accepted", "Offered"], // Add any other statuses as needed
-            default: "Pending", // Set a default status if necessary
-          },        },
-      },
-      paymentIntentId: { type: String },
-      userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' } // Reference to User model
+const userSchema = new mongoose.Schema(
+  {
+    email: {
+      type: String,
+      required: true,
+      unique: true,
     },
-  ],
-  quotes: [
-    {
-      type: {
-        pickup: {
-          lat: { type: Number, required: true },
-          lng: { type: Number, required: true },
-          address: { type: String },
-        },
-        destination: {
-          lat: { type: Number, required: true },
-          lng: { type: Number, required: true },
-          address: { type: String },
-        },
-        stop: {
-          lat: { type: Number },
-          lng: { type: Number },
-          address: { type: String },
-        },
-        persons: { type: Number, required: true },
-        pickupDate: { type: String, required: true },
-        pickupTime: { type: String, required: true },
-        returnPickupTime: { type: String },
-        additionalInfo: { type: String },
-        rideType: { type: String, required: true },
-        notificationType: { type: String, required: true },
-        status: { type: String, enum: ["Pending", "Confirmed", "Previous"], default: "Pending" },
-        paymentMethod: { type: String },
-        mapLocation: {
-          lat: { type: Number, required: true },
-          lng: { type: Number, required: true },
-          address: { type: String },
-        },
-        selectedRide: {
-          carName: { type: String, required: true },
-          baseRate: { type: Number, required: true },
-          donation: { type: Number, required: true },
-          totalRate: { type: Number, required: true },
-          imageUrl: { type: String, required: true },
-          rideStatus: { type: String, required: true },
-        },
-      },  // Use the RideQuoteSchema here
-      required: false,
+    password: {
+      type: String,
+      required: true,
     },
-  ],
-   // Optional company profile details
-   companyProfile: {
-    businessName: { type: String, default: "" },
+    firstName: {
+      type: String,
+      required: true,
+    },
+    lastName: {
+      type: String,
+      required: true,
+    },
+    phone: {
+      type: String,
+      required: true,
+    },
     address: {
-      line1: { type: String, default: "" },
-      city: { type: String, default: "" },
-      state: { type: String, default: "" },
-      postal_code: { type: String, default: "" },
-      country: { type: String, default: "" },
+      line1: { type: String },
+      city: { type: String },
+      state: { type: String },
+      postal_code: { type: String },
+      country: { type: String },
     },
-    metroArea: { type: String, default: "" },
-    officePhone: { type: String, default: "" },
-    cellPhone: { type: String, default: "" },
-    operatorLicense: { type: String, default: "" },
-    taxId: { type: String, default: "" },
-    area: { type: String, default: "" },
-    notification: { type: String, enum: ["By E-mail", "By Text", "By E-mail and Text"], default: "By E-mail" },
-    nlaMember: { type: String, enum: ["yes", "no"], default: "no" },
+    billingDetails: {
+      cardHolderName: { type: String },
+      cardType: { type: String },
+      expirationDate: { type: String },
+      last4: { type: String },
+    },
+    stripeCustomerId: {
+      type: String,
+    },
+    paymentMethodId: {
+      type: String,
+    },
+    setupIntentClientSecret: {
+      type: String,
+    },
+    role: {
+      type: String,
+      enum: ["user", "driver", "admin"],
+      default: "user",
+    },
+    selectedReservations: [
+      {
+        reservation: {
+          pickup: {
+            lat: { type: Number, required: true },
+            lng: { type: Number, required: true },
+            address: { type: String },
+          },
+          destination: {
+            lat: { type: Number, required: true },
+            lng: { type: Number, required: true },
+            address: { type: String },
+          },
+          stop: {
+            lat: { type: Number },
+            lng: { type: Number },
+            address: { type: String },
+          },
+          persons: { type: Number, required: true },
+          pickupDate: { type: String, required: true },
+          pickupTime: { type: String, required: true },
+          returnPickupTime: { type: String },
+          additionalInfo: { type: String },
+          rideType: { type: String, required: true },
+          notificationType: { type: String, required: true },
+          status: { type: String },
+          paymentMethod: { type: String },
+          mapLocation: {
+            lat: { type: Number, required: true },
+            lng: { type: Number, required: true },
+            address: { type: String },
+          },
+          selectedRide: {
+            carName: { type: String, required: true },
+            baseRate: { type: Number, required: true },
+            donation: { type: Number, required: true },
+            totalRate: { type: Number, required: true },
+            imageUrl: { type: String, required: true },
+          },
+        },
+        paymentIntentId: { type: String },
+        rideStatus: {
+          type: String,
+          enum: ["Pending", "Accepted", "Offered"], // Add any other statuses as needed
+          default: "Pending", // Set a default status if necessary
+        },
+      },
+    ],
+    quotes: [
+      {
+        type: {
+          pickup: {
+            lat: { type: Number, required: true },
+            lng: { type: Number, required: true },
+            address: { type: String },
+          },
+          destination: {
+            lat: { type: Number, required: true },
+            lng: { type: Number, required: true },
+            address: { type: String },
+          },
+          stop: {
+            lat: { type: Number },
+            lng: { type: Number },
+            address: { type: String },
+          },
+          persons: { type: Number, required: true },
+          pickupDate: { type: String, required: true },
+          pickupTime: { type: String, required: true },
+          returnPickupTime: { type: String },
+          additionalInfo: { type: String },
+          rideType: { type: String, required: true },
+          notificationType: { type: String, required: true },
+          status: {
+            type: String,
+            enum: ["Pending", "Confirmed", "Previous"],
+            default: "Pending",
+          },
+          paymentMethod: { type: String },
+          mapLocation: {
+            lat: { type: Number, required: true },
+            lng: { type: Number, required: true },
+            address: { type: String },
+          },
+          selectedRide: {
+            carName: { type: String, required: true },
+            baseRate: { type: Number, required: true },
+            donation: { type: Number, required: true },
+            totalRate: { type: Number, required: true },
+            imageUrl: { type: String, required: true },
+            rideStatus: { type: String, required: true },
+          },
+        }, // Use the RideQuoteSchema here
+        required: false,
+      },
+    ],
+    // Optional company profile details
+    companyProfile: {
+      businessName: { type: String, default: "" },
+      address: {
+        line1: { type: String, default: "" },
+        city: { type: String, default: "" },
+        state: { type: String, default: "" },
+        postal_code: { type: String, default: "" },
+        country: { type: String, default: "" },
+      },
+      metroArea: { type: String, default: "" },
+      officePhone: { type: String, default: "" },
+      cellPhone: { type: String, default: "" },
+      operatorLicense: { type: String, default: "" },
+      taxId: { type: String, default: "" },
+      area: { type: String, default: "" },
+      notification: {
+        type: String,
+        enum: ["By E-mail", "By Text", "By E-mail and Text"],
+        default: "By E-mail",
+      },
+      nlaMember: { type: String, enum: ["yes", "no"], default: "no" },
+    },
+    vehiclesDetails: [
+      {
+        type: { type: String },
+        passengers: { type: Number },
+        numberOfVehicles: { type: Number },
+        images: [String], // Array of image URLs
+      },
+    ],
   },
-  vehiclesDetails: [
-    {
-      type: { type: String},
-      passengers: { type: Number},
-      numberOfVehicles: { type: Number},
-      images: [String], // Array of image URLs
-    },
-  ],
-}, { timestamps: true });
+  { timestamps: true }
+);
 
 // Create and export the User model
-const User = mongoose.models.User || mongoose.model('User', userSchema);
+const User = mongoose.models.User || mongoose.model("User", userSchema);
 module.exports = User;
-
