@@ -755,6 +755,47 @@ const addOrUpdateVehicleDetails = async (req, res) => {
     return res.status(500).json({ error: "Server error" });
   }
 };
+// const updateUserData = async (req, res) => {
+//   const { userId } = req.params;
+//   const userData = req.body;
+//   const newReservation = userData.selectedReservations[0];
+
+//   try {
+//     const existingUser = await User.findById(userId);
+
+//     if (!existingUser) {
+//       return res.status(404).json({ message: "User not found" });
+//     }
+
+//     const reservationExists = existingUser.selectedReservations.some(
+//       (r) =>
+//         r?.reservation?._id?.toString() ===
+//         newReservation?.reservation?._id?.toString()
+//     );
+
+//     if (reservationExists) {
+//       return res.status(400).json({ message: "Reservation already accepted" });
+//     }
+
+//     const updatedUser = await User.findByIdAndUpdate(
+//       userId,
+//       {
+//         $push: {
+//           selectedReservations: {
+//             reservation: newReservation.reservation,
+//             rideStatus: newReservation.rideStatus,
+//           },
+//         },
+//       },
+//       { new: true }
+//     );
+
+//     res.status(200).json(updatedUser);
+//   } catch (error) {
+//     console.error("Error updating user data:", error);
+//     res.status(500).json({ message: "Internal server error", error });
+//   }
+// };
 const updateUserData = async (req, res) => {
   const { userId } = req.params;
   const userData = req.body;
@@ -767,23 +808,38 @@ const updateUserData = async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    const reservationExists = existingUser.selectedReservations.some(
+    // Find the index of the existing reservation in the array
+    const reservationIndex = existingUser.selectedReservations.findIndex(
       (r) =>
         r?.reservation?._id?.toString() ===
         newReservation?.reservation?._id?.toString()
     );
 
-    if (reservationExists) {
-      return res.status(400).json({ message: "Reservation already accepted" });
+    if (reservationIndex > -1) {
+      // Reservation exists, so update it using $set
+      const updatedUser = await User.findOneAndUpdate(
+        { _id: userId, "selectedReservations.reservation._id": newReservation.reservation._id },
+        {
+          $set: {
+            "selectedReservations.$.rideStatus": newReservation.rideStatus,
+          },
+        },
+        { new: true }
+      );
+
+      return res.status(200).json(updatedUser);
     }
 
+    // If the reservation doesn't exist, add it
     const updatedUser = await User.findByIdAndUpdate(
       userId,
       {
-        $push: {
+        $set: {
           selectedReservations: {
             reservation: newReservation.reservation,
             rideStatus: newReservation.rideStatus,
+            userId: newReservation.userId,
+            reservationId: newReservation._id,
           },
         },
       },

@@ -103,7 +103,7 @@ const userSchema = new mongoose.Schema(
     ],
     quotes: [
       {
-        type: {
+        quote: {
           pickup: {
             lat: { type: Number, required: true },
             lng: { type: Number, required: true },
@@ -143,10 +143,8 @@ const userSchema = new mongoose.Schema(
             donation: { type: Number, required: true },
             totalRate: { type: Number, required: true },
             imageUrl: { type: String, required: true },
-            rideStatus: { type: String, required: true },
           },
         }, // Use the RideQuoteSchema here
-        required: false,
       },
     ],
     // Optional company profile details
