@@ -75,7 +75,7 @@ const userSchema = new mongoose.Schema(
           returnPickupTime: { type: String },
           additionalInfo: { type: String },
           rideType: { type: String, required: true },
-          notificationType: { type: String, required: true },
+          notificationType: { type: String, required: false },
           status: { type: String },
           paymentMethod: { type: String },
           mapLocation: {
@@ -125,7 +125,7 @@ const userSchema = new mongoose.Schema(
           returnPickupTime: { type: String },
           additionalInfo: { type: String },
           rideType: { type: String, required: true },
-          notificationType: { type: String, required: true },
+          notificationType: { type: String, required: false },
           status: {
             type: String,
             enum: ["Pending", "Confirmed", "Previous"],

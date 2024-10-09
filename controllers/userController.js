@@ -800,7 +800,7 @@ const updateUserData = async (req, res) => {
   const { userId } = req.params;
   const userData = req.body;
   const newReservation = userData.selectedReservations[0];
-
+console.log("newReservation: ", newReservation)
   try {
     const existingUser = await User.findById(userId);
 
@@ -882,8 +882,8 @@ const updateDriverData = async (req, res) => {
           selectedReservations: {
             reservation: newReservation.reservation,
             rideStatus: newReservation.rideStatus,
-            userId: newReservation.reservation.userId, // storing userId
-            reservationId: newReservation.reservation._id,
+            userId: newReservation.userId, // storing userId
+            reservationId: newReservation._id,
           },
         },
       },
