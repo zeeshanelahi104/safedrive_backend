@@ -7,7 +7,7 @@ const getAllQuotes = async (req, res) => {
     try {
       // Fetch all ride quotes from the database
       const quotes = await RideQuote.find();
-  
+  console.log("All quotes: ", quotes)
       // Send a success response with the quotes data
       res.status(200).json({
         success: true,

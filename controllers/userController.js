@@ -796,11 +796,55 @@ const addOrUpdateVehicleDetails = async (req, res) => {
 //     res.status(500).json({ message: "Internal server error", error });
 //   }
 // };
+// const updateUserData = async (req, res) => {
+//   const { userId } = req.params;
+//   const userData = req.body;
+//   const newReservation = userData.selectedReservations[0];
+//   console.log("newReservation: ", newReservation)
+//   try {
+//     const existingUser = await User.findById(userId);
+
+//     if (!existingUser) {
+//       return res.status(404).json({ message: "User not found" });
+//     }
+
+//     // Find the index of the existing reservation in the array
+//     const reservationIndex = existingUser.selectedReservations.findIndex(
+//       (r) =>
+//         r?.reservationId?.toString() ===
+//         newReservation?.reservation?._id?.toString()
+//     );
+
+//     if (reservationIndex > -1) {
+//       // Reservation exists, so update it using $set
+//       const updatedUser = await User.findOneAndUpdate(
+//         { _id: userId, "selectedReservations.reservationId": newReservation.reservation._id },
+//         {
+//           $set: {
+//             selectedReservations: {
+//               reservation: newReservation.reservation,
+//               rideStatus: newReservation.rideStatus,
+//               userId: newReservation.userId,
+//               reservationId: newReservation._id,
+//             },
+//           },
+//         },
+//         { new: true }
+//       );
+//       return res.status(200).json(updatedUser);
+//     }
+//     res.status(200).json(updatedUser);
+//   } catch (error) {
+//     console.error("Error updating user data:", error);
+//     res.status(500).json({ message: "Internal server error", error });
+//   }
+// };
 const updateUserData = async (req, res) => {
   const { userId } = req.params;
   const userData = req.body;
+
   const newReservation = userData.selectedReservations[0];
-console.log("newReservation: ", newReservation)
+
   try {
     const existingUser = await User.findById(userId);
 
@@ -808,50 +852,26 @@ console.log("newReservation: ", newReservation)
       return res.status(404).json({ message: "User not found" });
     }
 
-    // Find the index of the existing reservation in the array
-    const reservationIndex = existingUser.selectedReservations.findIndex(
-      (r) =>
-        r?.reservation?._id?.toString() ===
-        newReservation?.reservation?._id?.toString()
-    );
-
-    if (reservationIndex > -1) {
-      // Reservation exists, so update it using $set
-      const updatedUser = await User.findOneAndUpdate(
-        { _id: userId, "selectedReservations.reservation._id": newReservation.reservation._id },
-        {
-          $set: {
-            "selectedReservations.$.rideStatus": newReservation.rideStatus,
-          },
-        },
-        { new: true }
-      );
-
-      return res.status(200).json(updatedUser);
-    }
-
-    // If the reservation doesn't exist, add it
-    const updatedUser = await User.findByIdAndUpdate(
-      userId,
+    // Directly update the existing reservation
+    const updatedUser = await User.findOneAndUpdate(
+      { _id: userId, "selectedReservations.reservationId": newReservation.reservation._id },
       {
         $set: {
-          selectedReservations: {
-            reservation: newReservation.reservation,
-            rideStatus: newReservation.rideStatus,
-            userId: newReservation.userId,
-            reservationId: newReservation._id,
-          },
+          "selectedReservations.$.reservation": newReservation.reservation,
+          "selectedReservations.$.rideStatus": newReservation.rideStatus,
         },
       },
       { new: true }
     );
 
-    res.status(200).json(updatedUser);
+    return res.status(200).json(updatedUser);
   } catch (error) {
     console.error("Error updating user data:", error);
-    res.status(500).json({ message: "Internal server error", error });
+    return res.status(500).json({ message: "An error occurred while updating user data", error });
   }
 };
+
+
 
 const updateDriverData = async (req, res) => {
   const { driverId } = req.params;
