@@ -36,6 +36,8 @@ const getSingleQuote = async (req, res) => {
 };
 const updateQuote = async (req, res) => {
     try {
+        console.log("req.params: ", req?.params);
+        console.log("req.body: ", req?.body);
       const { id } = req.params; // Get the quote ID from the request parameters
       const updateData = req.body; // Get the updated data from the request body
   
