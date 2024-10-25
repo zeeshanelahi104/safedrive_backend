@@ -93,7 +93,7 @@ const userSchema = new mongoose.Schema(
         paymentIntentId: { type: String },
         rideStatus: {
           type: String,
-          enum: ["Pending", "Accepted", "Offered"], // Add any other statuses as needed
+          enum: ["Pending", "Accepted", "Offered", "Confirmed", "Previous"], // Add any other statuses as needed
           default: "Pending", // Set a default status if necessary
         },
         userId: { type: mongoose.Schema.Types.ObjectId, ref: "User" }, // Add userId
@@ -174,7 +174,7 @@ const userSchema = new mongoose.Schema(
         type: { type: String },
         passengers: { type: Number },
         numberOfVehicles: { type: Number },
-        images: [String], // Array of image URLs
+        images: { type: Map, of: [String], default: {} },
       },
     ],
   },

@@ -732,7 +732,7 @@ const updateCompanyProfile = async (req, res) => {
 const addOrUpdateVehicleDetails = async (req, res) => {
   const { userId } = req.params; // Get userId from the URL parameters
   const { vehicleData } = req.body; // Get vehicleData from the request body
-
+console.log("vehicleData: ", vehicleData)
   try {
     // Find the user by ID
     const user = await User.findById(userId);
