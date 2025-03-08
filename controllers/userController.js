@@ -729,6 +729,68 @@ const updateCompanyProfile = async (req, res) => {
     });
   }
 };
+const updateDriverBillingDetails = async (req, res) => {
+  try {
+    const { id } = req.params; // Extract id from the URL parameters
+    const {
+      businessName,
+      address,
+      metroArea,
+      officePhone,
+      cellPhone,
+      operatorLicense,
+      taxId,
+      area,
+      notification,
+      nlaMember,
+    } = req.body;
+    console.log("Requested Data: ", req.body);
+    // Find the user by ID
+    const user = await User.findById(id);
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Update the company profile details if provided, otherwise keep the existing ones
+    user.companyProfile.businessName =
+      businessName || user.companyProfile.businessName;
+
+    user.companyProfile.address = {
+      line1: address?.line1 || user.companyProfile.address.line1,
+      city: address?.city || user.companyProfile.address.city,
+      state: address?.state || user.companyProfile.address.state,
+      postal_code:
+        address?.postal_code || user.companyProfile.address.postal_code,
+      country: address?.country || user.companyProfile.address.country,
+    };
+
+    user.companyProfile.metroArea = metroArea || user.companyProfile.metroArea;
+    user.companyProfile.officePhone =
+      officePhone || user.companyProfile.officePhone;
+    user.companyProfile.cellPhone = cellPhone || user.companyProfile.cellPhone;
+    user.companyProfile.operatorLicense =
+      operatorLicense || user.companyProfile.operatorLicense;
+    user.companyProfile.taxId = taxId || user.companyProfile.taxId;
+    user.companyProfile.area = area || user.companyProfile.area;
+    user.companyProfile.notification =
+      notification || user.companyProfile.notification;
+    user.companyProfile.nlaMember = nlaMember || user.companyProfile.nlaMember;
+
+    // Save the updated user
+    const updatedCompany = await user.save(); // Save method to update the user record in DB
+
+    return res.json({
+      message: "Company profile updated successfully",
+      company: updatedCompany,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: "Error updating company profile",
+      error: error.message,
+    });
+  }
+};
 const addOrUpdateVehicleDetails = async (req, res) => {
   const { userId } = req.params; // Get userId from the URL parameters
   const { vehicleData } = req.body; // Get vehicleData from the request body
@@ -941,5 +1003,6 @@ module.exports = {
   getAllReservations,
   searchByPhone,
   updateCompanyProfile,
+  updateDriverBillingDetails,
   addOrUpdateVehicleDetails,
 };
