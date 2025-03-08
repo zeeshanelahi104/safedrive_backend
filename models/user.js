@@ -35,7 +35,6 @@ const userSchema = new mongoose.Schema(
       cardHolderName: { type: String },
       cardType: {
         type: String,
-        enum: ["amex", "visa", "mastercard"],
       },
       expirationDate: { type: String },
       last4: { type: String },
